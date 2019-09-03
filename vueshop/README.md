@@ -1,6 +1,6 @@
-# newmojo
+# shopFX
 
-> A Vue.js project
+> 商城前端代码
 
 ## Build Setup
 

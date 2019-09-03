@@ -12,6 +12,10 @@ use apiadmin\modules\models\member\Member;
 class MemberController extends CoreController
 {
 
+	public function actionTest(){
+		echo 'hello boy or girl!';
+	}
+
 	/*
 		*会员列表
 	*/

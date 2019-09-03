@@ -1,25 +1,57 @@
-<p align="center">
-    <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
-    </a>
-    <h1 align="center">Yii 2 Advanced Project Template</h1>
+<div align="center">
+    <h1>shopFX</h1>
+    <P>一个简单又完整的商城</P>
     <br>
-</p>
+</div>
 
-Yii 2 Advanced Project Template is a skeleton [Yii 2](http://www.yiiframework.com/) application best for
-developing complex Web applications with multiple tiers.
+## 项目介绍 ##
+    这个一个用yii2 + vue 做的一个前后端分离的商城，包含了商城的完整的功能。权限管理、商品的增删改查、商品的规格管理、
+    订单管理、简单的物流、会员管理、文章管理、轮播图、商城积分管理。。。
 
-The template includes three tiers: front end, back end, and console, each of which
-is a separate Yii application.
+## 项目配置 ##
+    一、前期准备
+        1、下载项目
+            git clone https://github.com/FX336494/shopFX.git      // 把模板下载到本地
+        1、进入到项目 目录 shopFX下 
+            cd shopFX
+        2、安装依赖、推荐使用composer安装依赖 (没有安装composer的自行安装)
+            composer install
 
-The template is designed to work in a team development environment. It supports
-deploying the application in different environments.
+    二、后台接口配置
+        1、将设置好的域名(admin.shopfx.com)指向 /shopFX/apiadmin/web/   如："H:/wamp/www/shopFx/apiadmin/web"
+        2、在/shopFX/common/config/ 下配置数据库
+        3、将 /shopFX/shopfx_db.sql 导入数据库
+        4、接口的访问 如 http://admin.shopfx.com/v1/member/test
+    三、后台管理前端配置
+        1、cd vueadmin
+        2、安装依赖
+            npm install
+        3、在 ./src/components/js/request.js里配置接口域名
+        4、本地运行
+            npm run dev
+        5、执行构建命令，生成的dist文件夹放在服务器下即可访问
+            npm run build
+    四、商城接口配置
+        1、将设置好的域名(api.shopfx.com)指向 /shopFX/api/web/   如："H:/wamp/www/shopFx/api/web"
+        2、接口的访问 如 http://api.shopfx.com/v1/connect/test  
+    五、商城前端配置
+        1、cd vueshop
+        2、安装依赖
+            npm install
+        3、在 ./src/components/js/common.js里配置接口域名
+        4、本地运行
+            npm run dev
+        5、执行构建命令，生成的dist文件夹放在服务器下即可访问
+            npm run build    
 
-Documentation is at [docs/guide/README.md](docs/guide/README.md).
-
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Build Status](https://travis-ci.org/yiisoft/yii2-app-advanced.svg?branch=master)](https://travis-ci.org/yiisoft/yii2-app-advanced)
+## 效果图 后台管理 ##
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/1.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/2.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/3.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/4.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/5.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/6.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/7.png)
 
 目录结构
 -------------------
