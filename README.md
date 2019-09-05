@@ -81,3 +81,8 @@ console                 用于执行角本的，一些定时处理任务
 vendor/                 包含一些第三方的依赖包
 
 ```
+
+## 赞赏
+如果你觉得帮助到了你，可以请作者喝杯咖啡!
+
+![微信扫一扫](https://raw.githubusercontent.com/FX336494/admin_v1/master/apiadmin/web/data/6.png)
