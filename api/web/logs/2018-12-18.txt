@@ -1,0 +1,8 @@
+[2018-12-18 17:53:02]{"true_name":"\u6bdb\u5174\u5cf0","mob_phone":"15869836000","address":"\u804c\u9662\u8857\u957f\u6c99\u6cbb\u5b89\u7ba1\u7406\u652f\u961f\u5bbf\u820d \u5357\u680b206","province_id":"18","city_id":"275","area_id":"2920","area_info":"\u6e56\u5357 \u957f\u6c99\u5e02 \u8299\u84c9\u533a","is_default":"1","address_id":"1","client":"ios","auth_key":"9Jsn5UdCUmvHTJOgqAtpu5GtlaX7iyfC"}
+[2018-12-18 17:53:02]修改默认
+[2018-12-18 17:53:02]{"true_name":"\u6bdb\u5174\u5cf0","mob_phone":"15869836000","address":"\u804c\u9662\u8857\u957f\u6c99\u6cbb\u5b89\u7ba1\u7406\u652f\u961f\u5bbf\u820d \u5357\u680b206","province_id":"18","city_id":"275","area_id":"2920","area_info":"\u6e56\u5357 \u957f\u6c99\u5e02 \u8299\u84c9\u533a","is_default":"1","address_id":"1","client":"ios","auth_key":"9Jsn5UdCUmvHTJOgqAtpu5GtlaX7iyfC"}
+[2018-12-18 17:53:02]1
+[2018-12-18 17:53:17]{"true_name":"\u5c0f\u6bdb\u6bdb","mob_phone":"15526489554","address":"\u5c31\u5728\u90a3\u560e\u8fbe","province_id":"7","city_id":"121","area_id":"1620","area_info":"\u5409\u6797 \u957f\u6625\u5e02 \u4e8c\u9053\u533a","is_default":"1","address_id":"2","client":"ios","auth_key":"9Jsn5UdCUmvHTJOgqAtpu5GtlaX7iyfC"}
+[2018-12-18 17:53:17]修改默认
+[2018-12-18 17:53:17]{"true_name":"\u5c0f\u6bdb\u6bdb","mob_phone":"15526489554","address":"\u5c31\u5728\u90a3\u560e\u8fbe","province_id":"7","city_id":"121","area_id":"1620","area_info":"\u5409\u6797 \u957f\u6625\u5e02 \u4e8c\u9053\u533a","is_default":"1","address_id":"2","client":"ios","auth_key":"9Jsn5UdCUmvHTJOgqAtpu5GtlaX7iyfC"}
+[2018-12-18 17:53:17]1
