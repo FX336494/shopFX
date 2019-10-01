@@ -91,11 +91,7 @@ class CommonController extends CoreController
 		$res = $upload->upload('file',$basePath.'/'.$filePath);
 		if($res){
 			$fileName = $upload->getFileName();
-<<<<<<< HEAD
 			$data = array('url'=>'http://'.$_SERVER['HTTP_HOST'].'/'.$filePath.'/'.$fileName);
-=======
-			$data = array('url'=>'http://'.$_SERVER['HTTP_HOST'].$filePath.'/'.$fileName);
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
 			$this->out('上传成功',$data);
 		}
 		$this->error('上传失败');		

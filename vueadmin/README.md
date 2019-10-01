@@ -1,223 +1,29 @@
-<<<<<<< HEAD
-# vue-manage-system #
-基于Vue.js 2.x系列 + Element UI 的后台管理系统解决方案。[线上地址](http://blog.gdfengshuo.com/example/work/)
+<div align="center">
+    <h1>shopFX</h1>
+    <P>一个简单又完整的商城</P>
+    <br>
+</div>
 
-[English document](https://github.com/lin-xin/manage-system/blob/master/README_EN.md)
+## 项目介绍 ##
+    这个一个用yii2 + vue 做的一个前后端分离的商城，包含了商城的完整的功能。权限管理、商品的增删改查、商品的规格管理、
+    订单管理、简单的物流、会员管理、文章管理、轮播图、商城积分管理。。。
+    还有就是后端的vue路由不需要在前端的router中添加，只需要在菜单操作处，将路由信息添加到数据库即可。登录之后会进行路由的动态挂载。每次添加新菜单或是路由，需要重新登录才会生效。
 
-[更新日志](https://github.com/lin-xin/vue-manage-system/releases)
+## 项目配置 ##
+    一、前期准备
+        1、下载项目
+            git clone https://github.com/FX336494/shopFX.git      // 把模板下载到本地
+        1、进入到项目 目录 shopFX下 
+            cd shopFX
+        2、安装依赖、推荐使用composer安装依赖 (没有安装composer的自行安装)
+            composer install
 
-## 赞赏
-请作者喝杯咖啡吧！
-
-![微信扫一扫](http://blog.gdfengshuo.com/images/weixin.jpg)
-
-## 前言 ##
-之前在公司用了Vue + Element组件库做了个后台管理系统，基本很多组件可以直接引用组件库的，但是也有一些需求无法满足。像图片裁剪上传、富文本编辑器、图表等这些在后台管理系统中很常见的功能，就需要引用其他的组件才能完成。从寻找组件，到使用组件的过程中，遇到了很多问题，也积累了宝贵的经验。所以我就把开发这个后台管理系统的经验，总结成这个后台管理系统解决方案。
-
-该方案作为一套多功能的后台框架模板，适用于绝大部分的后台管理系统（Web Management System）开发。基于vue.js,使用vue-cli脚手架快速生成项目目录，引用Element UI组件库，方便开发快速简洁好看的组件。分离颜色样式，支持手动切换主题色，而且很方便使用自定义主题色。
-
-## 功能 ##
-- [x] Element UI
-- [x] 登录/注销
-- [x] Dashboard
-- [x] 表格
-- [x] Tab选项卡
-- [x] 表单
-- [x] 图表 :bar_chart:
-- [x] 富文本编辑器
-- [x] markdown编辑器
-- [x] 图片拖拽/裁剪上传
-- [x] 支持切换主题色 :sparkles:
-- [x] 列表拖拽排序
-- [x] 权限测试
-- [x] 404 / 403
-- [x] 三级菜单
-- [x] 自定义图标
-
-
-## 目录结构介绍 ##
-
-	|-- build                            // webpack配置文件
-	|-- config                           // 项目打包路径
-	|-- src                              // 源码目录
-	|   |-- components                   // 组件
-	|       |-- common                   // 公共组件
-	|           |-- bus.js           	 // Event Bus
-	|           |-- Header.vue           // 公共头部
-	|           |-- Home.vue           	 // 公共路由入口
-	|           |-- Sidebar.vue          // 公共左边栏
-	|           |-- Tags.vue           	 // 页面切换标签组件
-	|       |-- page                   	 // 主要路由页面
-	|           |-- 403.vue
-	|           |-- 404.vue
-	|           |-- BaseCharts.vue       // 基础图表
-	|           |-- BaseForm.vue         // 基础表单
-	|           |-- BaseTable.vue        // 基础表格
-	|           |-- DashBoard.vue        // 系统首页
-	|           |-- DragList.vue         // 拖拽列表组件
-	|           |-- Icon.vue			 // 自定义图标组件
-	|           |-- Login.vue          	 // 登录
-	|           |-- Markdown.vue         // markdown组件
-	|           |-- Premission.vue       // 权限测试组件
-	|           |-- Upload.vue           // 图片上传
-	|           |-- VueEditor.vue        // 富文本编辑器
-	|   |-- App.vue                      // 页面入口文件
-	|   |-- main.js                      // 程序入口文件，加载各种公共组件
-	|-- .babelrc                         // ES6语法编译配置
-	|-- .editorconfig                    // 代码编写规格
-	|-- .gitignore                       // 忽略的文件
-	|-- index.html                       // 入口html文件
-	|-- package.json                     // 项目及工具的依赖配置文件
-	|-- README.md                        // 说明
-
-
-## 安装步骤 ##
-
-	git clone https://github.com/lin-xin/vue-manage-system.git      // 把模板下载到本地
-	cd vue-manage-system    // 进入模板目录
-	npm install         // 安装项目依赖，等待安装完成之后
-
-## 本地开发 ##
-
-	// 开启服务器，浏览器访问 http://localhost:8080
-	npm run dev
-
-## 构建生产 ##
-
-	// 执行构建命令，生成的dist文件夹放在服务器下即可访问
-	npm run build
-
-## 组件使用说明与演示 ##
-
-### vue-schart ###
-vue.js封装sChart.js的图表组件。访问地址：[vue-schart](https://github.com/linxin/vue-schart)
-<p><a href="https://www.npmjs.com/package/vue-schart"><img src="https://img.shields.io/npm/dm/vue-schart.svg" alt="Downloads"></a></p>
-
-```html
-<template>
-    <div>
-        <schart  class="wrapper"
-				:canvasId="canvasId"
-				:type="type"
-				:data="data"
-				:options="options"
-		></schart>
-    </div>
-</template>
-	
-<script>
-    import Schart from 'vue-schart';        // 导入Schart组件
-    export default {
-        data: function(){
-            return {
-                canvasId: 'myCanvas',       // canvas的id
-                type: 'bar',                // 图表类型
-                data: [
-                    {name: '2014', value: 1342},
-                    {name: '2015', value: 2123},
-                    {name: '2016', value: 1654},
-                    {name: '2017', value: 1795},
-                ],
-                options: {                  // 图表可选参数
-                    title: 'Total sales of stores in recent years'
-                }
-            }
-        },
-        components: {
-            Schart
-        }
-    }
-</script>
-<style>
-.wrapper{
-	width: 7rem;
-	height: 5rem;
-}
-</style>
-```
-
-### element-ui ###
-一套基于vue.js2.0的桌面组件库。访问地址：[element](http://element.eleme.io/#/zh-CN/component/layout)
-
-### Vue-Quill-Editor ###
-基于Quill、适用于Vue2的富文本编辑器。访问地址：[vue-quill-editor](https://github.com/surmon-china/vue-quill-editor)
-
-（IE10及以下不支持）
-
-### mavonEditor ###
-基于Vue的markdown编辑器。访问地址：[mavonEditor](https://github.com/hinesboy/mavonEditor)
-
-### vue-cropperjs ###
-一个封装了 cropperjs 的 Vue 组件，用于裁剪图片。访问地址：[vue-cropperjs](https://github.com/Agontuk/vue-cropperjs)
-
-## 其他注意事项 ##
-### 一、如果我不想用到上面的某些组件呢，那我怎么在模板中删除掉不影响到其他功能呢？ ###
-
-举个栗子，我不想用 Vue-Quill-Editor 这个组件，那我需要分四步走。
-
-第一步：删除该组件的路由，在目录 src/router/index.js 中，找到引入改组件的路由，删除下面这段代码。
-
-```JavaScript
-{
-    // 富文本编辑器组件
-    path: '/editor',
-    component: resolve => require(['../components/page/VueEditor.vue'], resolve) 
-},
-```
-
-第二步：删除引入该组件的文件。在目录 src/components/page/ 删除 VueEditor.vue 文件。
-
-第三步：删除该页面的入口。在目录 src/components/common/Sidebar.vue 中，找到该入口，删除下面这段代码。
-	
-```js
-{
-	index: 'editor',
-	title: '富文本编辑器'
-},
-```
-
-第四步：卸载该组件。执行以下命令：
-	
-	npm un vue-quill-editor -S
-
-完成。
-
-### 二、如何切换主题色呢？ ###
-
-第一步：打开 src/main.js 文件，找到引入 element 样式的地方，换成浅绿色主题。
-
-```javascript
-import 'element-ui/lib/theme-default/index.css';    // 默认主题
-// import '../static/css/theme-green/index.css';       // 浅绿色主题
-```
-
-第二步：打开 src/App.vue 文件，找到 style 标签引入样式的地方，切换成浅绿色主题。
-
-```javascript
-@import "../static/css/main.css";
-@import "../static/css/color-dark.css";     /*深色主题*/
-/*@import "../static/css/theme-green/color-green.css";   !*浅绿色主题*!*/
-```
-
-第三步：打开 src/components/common/Sidebar.vue 文件，找到 el-menu 标签，把 background-color/text-color/active-text-color 属性去掉即可。
-
-## 项目截图 ##
-### 默认皮肤 ###
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms1.png)
-
-### 浅绿色皮肤 ###
-
-![Image text](https://github.com/lin-xin/manage-system/raw/master/screenshots/wms2.png)
-=======
-## 后台管理配置 ##
-
-    一、后台接口配置
+    二、后台接口配置
         1、将设置好的域名(admin.shopfx.com)指向 /shopFX/apiadmin/web/   如："H:/wamp/www/shopFx/apiadmin/web"
         2、在/shopFX/common/config/ 下配置数据库
         3、将 /shopFX/shopfx_db.sql 导入数据库
         4、接口的访问 如 http://admin.shopfx.com/v1/member/test
-    二、后台管理前端配置
+    三、后台管理前端配置
         1、cd vueadmin
         2、安装依赖
             npm install
@@ -226,4 +32,76 @@ import 'element-ui/lib/theme-default/index.css';    // 默认主题
             npm run dev
         5、执行构建命令，生成的dist文件夹放在服务器下即可访问
             npm run build
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
+    四、商城接口配置
+        1、将设置好的域名(api.shopfx.com)指向 /shopFX/api/web/   如："H:/wamp/www/shopFx/api/web"
+        2、接口的访问 如 http://api.shopfx.com/v1/connect/test  
+    五、商城前端配置
+        1、cd vueshop
+        2、安装依赖
+            npm install
+        3、在 ./src/components/js/common.js里配置接口域名
+        4、本地运行
+            npm run dev
+        5、执行构建命令，生成的dist文件夹放在服务器下即可访问
+            npm run build    
+
+## 效果图 后台管理 ##
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/1.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/2.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/3.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/4.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/5.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/6.png)
+![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/7.png)
+
+目录结构
+-------------------
+
+```
+api                     前端商城的api接口
+    config/             接口的配置文件
+    modules/
+        models/         api数据模型
+        v1/             api控制器
+    runtime/            
+    web/                api入口
+apiadmin                后台管理的api接口
+    config/             接口的配置文件
+    modules/
+        models/         后台api数据模型
+        v1/             后台api控制器
+    runtime/            
+    web/                api入口
+vueadmin                后台管理vue项目代码
+vueshop                 前端vue项目代码
+common
+    config/             包含共享配置
+    models/             共用的数据模型
+    utils               包含一些共用的类
+console                 用于执行角本的，一些定时处理任务
+vendor/                 包含一些第三方的依赖包
+
+```
+
+## 一些说明
+    1、商品规格
+        这个商城虽然简单，但是对规格这块做的还是比较完善的，对规格也是做了库存的控制。这里主要是想说一下规格的
+        设置，这里是将不同的规格做了一个分组的处理，以适应不同的分类。比如，设置了颜色、尺寸、内存等等规格，
+        那么我们可以将这三个规格，分为一个组 叫电子产品。当我们添加手机这个分类的时候，就可以将他的规格组选为
+        电子产品，当我们在手机分类下，添加产品的时候 ，这三个规格就会显示出来。
+    2、图片上传
+        图片上传有两种方式，一种是本地上传，一种是七牛上传（七牛是需要申请的）
+    3、模型的设计
+        我把大部分的共用模型都放在了common模块中，api、和 apiadmin 里对应的模型去继承common的模型，
+        这样写虽然有点麻烦，但扩展性会要好点。 
+    4、最后两句
+        我觉得用一个项目做二开的时候，一定要理清项目的思路，这样写的时候就不会太乱。当别人接手你的项目的
+        时候，也不会觉得杂乱。我现在就是这样，接手了一个三、四开的项目，里面五花八门，你想整理难度太大，所以只能按自己的思路写，这样就更乱，然后某天当你不得去看以前别人写的东西的时候 ，你会发现，这个功能其实已经写过类似的了，你只要稍加修改就已经可以用了。
+    5、其它有想到的再说吧 
+
+
+## 赞赏
+如果你觉得帮助到了你，可以请作者喝杯咖啡
+
+![微信扫一扫](https://raw.githubusercontent.com/FX336494/admin_v1/master/apiadmin/web/data/6.png)
+=======

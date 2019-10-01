@@ -1,11 +1,7 @@
 <template>
 	<div class="wrapper">
 			<div class="item upload">
-<<<<<<< HEAD
 				<i class="iconfont icon-upload" :style="'font-size:'+size+'px'" :class="opacity?'show':'hid'"></i>
-=======
-				<i class="iconfont icon-tianjiatupian" :style="'font-size:'+size+'px'" :class="opacity?'show':'hid'"></i>
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
 				<input type="file" accept="image/*" @change="setImg($event)" />
 			</div>
 
@@ -28,24 +24,14 @@
                     <el-button @click="canel_">取 消</el-button>
                     <el-button type="primary" @click="cropImage">确 定</el-button>
                 </span>
-<<<<<<< HEAD
 		    </el-dialog>
-
-=======
-		    </el-dialog>
-
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
         <loading :ifload="ifload"></loading>
 	</div>
 </template>
 
 <script type="text/javascript">
-import {ajax_upload} from '@/components/js/request.js'
-<<<<<<< HEAD
+import {ajax_upload} from '@/components/js/request.js' 
 import VueCropper from 'vue-cropperjs';
-=======
-import VueCropper from 'vue-cropperjs';
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
 import loading from '@/components/utils/loading';
 export default{
 	props:{

@@ -11,14 +11,6 @@ use apiadmin\modules\models\member\Member;
 
 class MemberController extends CoreController
 {
-
-<<<<<<< HEAD
-=======
-	public function actionTest(){
-		echo 'hello boy or girl!';
-	}
-
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
 	/*
 		*会员列表
 	*/
