@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # newmojo
 
 > A Vue.js project
+=======
+# shopFX
+
+> 商城前端代码
+>>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
 
 ## Build Setup
 
