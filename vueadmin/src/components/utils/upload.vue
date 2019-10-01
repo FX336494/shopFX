@@ -1,7 +1,7 @@
 <template>
 	<div class="wrapper">
 			<div class="item upload">
-				<i class="iconfont icon-tianjiatupian" :style="'font-size:'+size+'px'" :class="opacity?'show':'hid'"></i>
+				<i class="iconfont icon-upload" :style="'font-size:'+size+'px'" :class="opacity?'show':'hid'"></i>
 				<input type="file" accept="image/*" @change="setImg($event)" />
 			</div>
 
