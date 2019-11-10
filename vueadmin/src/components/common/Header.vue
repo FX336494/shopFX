@@ -24,11 +24,7 @@
                         {{username}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-<<<<<<< HEAD
-                        <a href="https://github.com/lin-xin/vue-manage-system" target="_blank">
-=======
                         <a href="https://github.com/FX336494/shopFX" target="_blank">
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
                             <el-dropdown-item>项目仓库</el-dropdown-item>
                         </a>
                         <el-dropdown-item divided  command="loginout">退出登录</el-dropdown-item>

@@ -200,8 +200,4 @@ export default{
 		color:#fff;
 		border:none;
 	}
-<<<<<<< HEAD
 </style>
-=======
-</style>
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09

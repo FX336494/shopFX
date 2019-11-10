@@ -23,7 +23,7 @@ class Member extends MemberModel
     public static function getMemberByIdOrMobile($member)
     {
         if(!$member) return false; 
-        $data = self::find()->where(['or','id='.$member,"member_mobile='".$member."'"])->one();      
+        $data = self::find()->where(['or','member_id='.$member,"member_mobile='".$member."'"])->one();      
         if($data) $data = $data->toArray(); 
         return $data;
     } 

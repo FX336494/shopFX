@@ -103,9 +103,4 @@ vendor/                 包含一些第三方的依赖包
 ## 赞赏
 如果你觉得帮助到了你，可以请作者喝杯咖啡
 
-<<<<<<< HEAD
 ![微信扫一扫](https://raw.githubusercontent.com/FX336494/admin_v1/master/apiadmin/web/data/6.png)
-=======
-=======
-![微信扫一扫](https://raw.githubusercontent.com/FX336494/admin_v1/master/apiadmin/web/data/6.png)
->>>>>>> 133fe356e8f88c0707d7d78a3abaea2db6376d09
