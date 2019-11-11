@@ -24,17 +24,17 @@ class Goods extends GoodsModel
 					$specValTmp = array();
 					foreach($specValue as $val)
 					{
-						if($val['spec_id']){
+						if(isset($val['spec_id'])){
 							$specValTmp[$val['val_id']] = $val['spec_val'];
 						}
 						// var_dump($val);
-						if($val['spec_id']==1){  //系统默认1为颜色规格
+						if(isset($val['spec_id']) && $val['spec_id']==1){  //系统默认1为颜色规格
 							$data['color_id'] = (int)$val['val_id'];
 						}							
-						if($val['price']){
+						if(isset($val['price'])){
 							$data['goods_price'] = $val['price'];
 						}
-						if($val['storage']){
+						if(isset($val['storage'])){
 							$data['goods_storage'] = $val['storage'];
 						}		
 	

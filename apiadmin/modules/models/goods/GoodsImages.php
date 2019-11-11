@@ -70,13 +70,13 @@ class GoodsImages extends GoodsImagesModel
 					$imageModel = clone $this;
 					$imageModel->color_id = $colorId;
 					$imageModel->goods_commonid = $goodsCommonId;					
-					if(!$image['id'])
+					if(!isset($image['id']))
 					{
 						//新增
 						$imageModel->isNewRecord = true; 
 						$imageModel->id = 0;	
 						$imageModel->image_url = $image['image_url'];
-						$imageModel->sort = $image['sort']?$image['sort']:0;
+						$imageModel->sort = isset($image['sort'])?$image['sort']:0;
 
 					}else
 					{
@@ -84,7 +84,7 @@ class GoodsImages extends GoodsImagesModel
 						$imageModel->isNewRecord = false; 
 						$imageModel->id = $image['id'];			
 						$imageModel->image_url = $image['image_url'];	
-						$imageModel->sort = $image['sort']?$image['sort']:0;		
+						$imageModel->sort = isset($image['sort'])?$image['sort']:0;	
 					}
 
 					if(!$imageModel->validate() || !$imageModel->save()){

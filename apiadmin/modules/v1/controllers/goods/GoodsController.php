@@ -111,7 +111,7 @@ class GoodsController extends CoreController
 		{
 			foreach($specValue as $val)
 			{
-				if(!$val['spec_id']) continue;
+				if(!isset($val['spec_id']) || $val['spec_id']) continue;
 				$temp[$val['spec_id']][$val['val_id']] = $val['spec_val'];
 			}
 			$valData = $temp;

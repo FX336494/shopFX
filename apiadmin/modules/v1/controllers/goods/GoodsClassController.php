@@ -108,7 +108,7 @@ class GoodsClassController extends CoreController
 	 	//通过分组类型 获取对应规格
 	 	$specNames = TypeSpec::getTypeSpecDetail($class['type_id']);
 
-	 	$goodsSpecName = [];
+	 	$goodsSpecName = $goodsSpecVal = [];
 	 	if($goodsCommonId){
 	 		$where = ['goods_commonid'=>$goodsCommonId];
 	 		$goods = GoodsCommon::getCommonGoods($where,['spec_name','spec_value']);
@@ -120,12 +120,17 @@ class GoodsClassController extends CoreController
 	 	//获取每个规格的值
 	 	foreach($specNames as &$val)
 	 	{
-	 		if($goodsSpecName[$val['spec_id']])
+	 		if(isset($goodsSpecName[$val['spec_id']]) && $goodsSpecName[$val['spec_id']])
 	 			$val['checked'] = true;
 	 		$specValue = SpecValue::specValueList($val['spec_id']);
-	 		foreach($specValue as &$v){
-	 			$v['checked'] = $goodsSpecVal[$val['spec_id']][$v['id']]?true:false;
+	 		if($specValue)
+	 		{
+		 		foreach($specValue as &$v)
+		 		{
+		 			$v['checked'] = isset($goodsSpecVal[$val['spec_id']])&&$goodsSpecVal[$val['spec_id']][$v['id']]?true:false;
+		 		}	 			
 	 		}
+
 	 		$val['spec_value'] = $specValue;
 	 	}
 
