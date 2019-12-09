@@ -6,13 +6,13 @@
 					<el-form-item label="商品分类">
 						<el-select style="width:120px;" v-model="form.gc_id1" placeholder="请选择" @change="classChange">
 							<el-option
-							  v-for="item in class1" 
+							  v-for="item in class1"
 							  :key="item.id"
 							  :label="item.category_name"
 							  :value="item.id">
 							</el-option>
-						</el-select>	
-												
+						</el-select>
+
 						<el-select  style="width:120px;"  v-show="class2.length" v-model="form.gc_id2"  @change="classChange1" placeholder="请选择">
 							<el-option
 							  v-for="item in class2"
@@ -20,7 +20,7 @@
 							  :label="item.category_name"
 							  :value="item.id">
 							</el-option>
-						</el-select>	
+						</el-select>
 						<el-select style="width:120px;"  v-show="class3.length" v-model="form.gc_id3"  @change="classChange2" placeholder="请选择">
 							<el-option
 							  v-for="item in class3"
@@ -28,19 +28,19 @@
 							  :label="item.category_name"
 							  :value="item.id">
 							</el-option>
-						</el-select>																			
-																		
-					</el-form-item>								
-						
+						</el-select>
+
+					</el-form-item>
+
 					<el-form-item label="商品名称">
 						<el-input v-model="form.goods_name" placeholder="请输入商品名称"></el-input>
 					</el-form-item>
 					<el-form-item label="商品价格">
 						<el-input v-model="form.goods_price" placeholder="请输入商品价格"></el-input>
-					</el-form-item>	
+					</el-form-item>
 					<el-form-item label="市场价格">
 						<el-input v-model="form.goods_marketprice" placeholder="请输入市场价格"></el-input>
-					</el-form-item>	
+					</el-form-item>
 					<el-form-item label="成本价">
 						<el-input v-model="form.goods_costprice" placeholder="请输入成本价"></el-input>
 					</el-form-item>
@@ -49,14 +49,14 @@
 						<div v-show="form.goods_image">
 							<img :src="form.goods_image" width="128px"/>
 						</div>
-						<upload :size="32" :uptype="2" @showImg="showImg"></upload>
+						<upload :size="32" :uptype="2" :uploadType="'2'" @showImg="showImg"></upload>
 					</el-form-item>
-					<el-form-item label="规格" v-show="specArr.length">
+					<el-form-item label="规格" v-show="specArr && specArr.length">
 						<el-row v-for="(spec,index) in specArr" :key="index">
 							<el-col :span="3">{{spec.spec_name}}</el-col>
 							<el-col :span="21">
-								<el-checkbox  
-								v-for="(value,i) in spec.spec_value" 
+								<el-checkbox
+								v-for="(value,i) in spec.spec_value"
 								v-model="specArr[index]['spec_value'][i]['checked']"
 								@change="specChange"
 								:key="i">
@@ -64,57 +64,57 @@
 								</el-checkbox>
 							</el-col>
 						</el-row>
-					</el-form-item>						
+					</el-form-item>
 					<el-form-item label="规格配置" v-show="checkedSpec && checkedSpecValue">
-						<el-row > 
+						<el-row >
 							<el-col :span="4" v-for="(title,tindex) in checkedSpec" :key="tindex" v-if="title">
 								{{title.spec_name}}
 							</el-col>
-							<el-col :span="4" v-show="checkedSpec.length">
+							<el-col :span="4" v-show="checkedSpec && checkedSpec.length">
 								价格 <i class="iconfont icon-xiugai-copy" @click="editPrice"></i>
 							</el-col>
-							<el-col :span="4" v-show="checkedSpec.length">
+							<el-col :span="4" v-show="checkedSpec && checkedSpec.length">
 								库存 <i class="iconfont icon-xiugai-copy" @click="editStock"></i>
 							</el-col>
-																					
+
 						</el-row>
 						<el-row v-for="(item,index) in checkedSpecValue" :key="index">
 							<div v-for="(valItem,i) in item" :key="i">
 								<el-col :span="4" v-show="valItem.spec_val">
 									{{valItem.spec_val}}
-								</el-col>		
+								</el-col>
 
 								<el-col :span="4" v-show="valItem.price!=undefined">
 									<el-input style="width:80px" v-model="checkedSpecValue[index][i].price"></el-input>
-								</el-col>	
+								</el-col>
 								<el-col :span="4" v-show="valItem.storage!=undefined">
 									<el-input style="width:80px" v-model="checkedSpecValue[index][i].storage" @input="caluStorage"></el-input>
-								</el-col>																																	
+								</el-col>
 							</div>
 
 						</el-row>
-					</el-form-item>							
+					</el-form-item>
 					<el-form-item label="商品库存">
 						<el-input :disabled="storageDis" v-model="form.goods_storage" placeholder="请输入商品库存"></el-input>
-					</el-form-item>	
+					</el-form-item>
 					<el-form-item label="库存报警值">
 						<el-input v-model="form.goods_storage_alarm" placeholder="请输入库存报警值"></el-input>
-					</el-form-item>							
+					</el-form-item>
 					<el-form-item label="运费">
 						<el-input v-model="form.goods_freight" placeholder="请输入运费"></el-input>
-					</el-form-item>	
+					</el-form-item>
 					<el-form-item label="推荐商品">
 						<el-radio v-model="form.goods_commend" label="1">是</el-radio>
-						<el-radio v-model="form.goods_commend" label="0">否</el-radio>						
-					</el-form-item>						
+						<el-radio v-model="form.goods_commend" label="0">否</el-radio>
+					</el-form-item>
 					<el-form-item label="商品发布">
 						<el-radio v-model="form.goods_state" label="1">立即发布</el-radio>
-						<el-radio v-model="form.goods_state" label="0">放入仓库</el-radio>						
-					</el-form-item>	
+						<el-radio v-model="form.goods_state" label="0">放入仓库</el-radio>
+					</el-form-item>
 					<el-form-item label="">
 						<el-button :loading="ifload" type="primary" @click="saveGoods">保存</el-button>
 					</el-form-item>
-				</el-form>				
+				</el-form>
 			</el-col>
 		</el-row>
 
@@ -123,15 +123,15 @@
 			<el-row>
 				<el-col :span="6" style="text-align:center;">{{editLabel}}</el-col>
 				<el-col :span="18">
-					<el-input v-model="eidtVal"></el-input> 
+					<el-input v-model="eidtVal"></el-input>
 				</el-col>
-			</el-row> 
+			</el-row>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
-        </el-dialog>		
-		
+        </el-dialog>
+
 		<loading :ifload="ifload"></loading>
 	</div>
 </template>
@@ -142,7 +142,7 @@
 	export default{
 		components:{loading,upload},
 		props:{
-			goodsCommonid:{type:Number,default:0}, 
+			goodsCommonid:{type:Number,default:0},
 		},
 		data() {
 			return {
@@ -171,23 +171,23 @@
 				class3:[],
 				curClass:[],
 				specArr:[], //组规格
-				checkedSpec:[], //选中的规格 
+				checkedSpec:[], //选中的规格
 				checkedSpecValue:[], //选中的规格值组合
-				
+
 				storageDis:false,
 				editVisible:false,
 				editLabel:'价格',
 				eidtVal:0,
 				editType:'price',
 			}
-		},		
+		},
 		created() {
 			this.$nextTick(()=>{
 				this.getClass(0,0);
 				this.form.goods_commonid = this.goodsCommonid;
 				this._initGoodsData();
 			})
-		},	
+		},
 		methods: {
 			//获取产品初始信息
 			_initGoodsData() {
@@ -206,7 +206,7 @@
 					this.form.goods_name = res.data.goods_name;
 					this.form.goods_image = res.data.goods_image;
 					this.form.goods_price = res.data.goods_price;
-					this.form.goods_costprice = res.data.goods_costprice;	
+					this.form.goods_costprice = res.data.goods_costprice;
 					this.form.goods_marketprice = res.data.goods_marketprice;
 					this.form.goods_storage = res.data.goods_storage;
 					this.form.goods_storage_alarm = res.data.goods_storage_alarm;
@@ -214,17 +214,17 @@
 					this.form.type_id = res.data.type_id;
 					this.form.goods_freight = res.data.goods_freight;
 					this.form.goods_commend = res.data.goods_commend;
-					this.checkedSpec = res.data.checked_spec; 
+					this.checkedSpec = res.data.checked_spec;
 					this.checkedSpecValue = res.data.checked_spec_value;
 					if(this.form.gc_id1>0) this.getClass(this.form.gc_id1,1);
 					if(this.form.gc_id2>0) this.getClass(this.form.gc_id2,2);
 					if(this.form.gc_id3>0) this.getClass(this.form.gc_id3,3);
-					
-					
+
+
 				})
-				
+
 			},
-			
+
 			//获取分类
 			getClass(pid,level) {
 				this.ifload = true;
@@ -237,21 +237,21 @@
 							this.class2 = res.data;
 						}else if(level==2){
 							this.class3 = res.data;
-						}		
+						}
 					}else{
 						//检查是否有分类规格
-						this.showSpec();						
+						this.showSpec();
 					}
 				})
-				
+
 			},
-            
+
 			//显示图片
 			showImg(imgUrl) {
 				console.log(imgUrl);
 				this.form.goods_image = imgUrl;
             },
-			
+
 			//选择分类
 			classChange(gcId) {
 				this.form.gc_id = gcId;
@@ -264,8 +264,8 @@
 			classChange2(gcId) {
 				this.form.gc_id = gcId;
 				this.getClass(gcId,3);
-			},			
-			
+			},
+
 			//获取规格
 			showSpec() {
 				if(this.form.gc_id != this.oldGcId){
@@ -284,7 +284,7 @@
 					console.log(res);
 					if(res.code=='0'){
 						this.specArr = res.data;
-						this.form.type_id = res.extend.type_id;
+						if(res.extend) this.form.type_id = res.extend.type_id;
 						// if(this.goodsCommonid>0){
 						// 	this.specChange();
 						// 	console.log(this.checkedSpecValue);
@@ -300,7 +300,7 @@
 			formatSpecArr() {
 				console.log(this.checkedSpec);
 			},
-			
+
 			//勾选规格
 			specChange() {
 				let checkedSpec = [];
@@ -328,8 +328,8 @@
 					if(checkSpecVal.length){
 						checkedSpec.push(checkSpecVal);
 					}
-					
-					//获取选择的规格 
+
+					//获取选择的规格
 					if(spec.checked){
 						let wasFlag = true;
 						console.log(this.checkedSpec);
@@ -337,10 +337,10 @@
 							if(val.spec_id==spec.spec_id){
 								wasFlag = false;
 							}
-						})							
+						})
 						if(wasFlag){
 							let selectSpec = {spec_id:spec.spec_id,spec_name:spec.spec_name};
-							this.checkedSpec[spec.spec_id] = selectSpec;									
+							this.checkedSpec[spec.spec_id] = selectSpec;
 						}
 					}else{
 						this.checkedSpec.forEach((val,i)=>{
@@ -355,35 +355,35 @@
 					this.checkedSpecValue = [];
 					this.storageDis = false;
 					return ;
-				} 
+				}
 				console.log(checkedSpec);
 				let res = this.descartes(checkedSpec);
 				let data = [];
-				
+
 				//额外增加一些参数
 				if(res[0].spec_id!=undefined){
-					res.forEach((val,i)=>{ 
+					res.forEach((val,i)=>{
 						val.price = 0;
 						val.storage = 0;
 						val = [val];
 						data.push(val);
 					});
-					
+
 				}else{
 					res.forEach((val,i)=>{
 						console.log(val);
 						val.push({price:0});
-						val.push({storage:0}); 
+						val.push({storage:0});
 						data.push(val);
-					})					
+					})
 				}
 				if(data.length>0){
 					this.storageDis = true;
 				}
 				console.log(this.storageDis);
-				this.checkedSpecValue = data;				
+				this.checkedSpecValue = data;
 			},
-			
+
 			/**
 			 * 生成笛卡尔积
 			 * @returns {*}
@@ -403,12 +403,12 @@
 
 					return res;
 				});
-			},							
-		
+			},
+
 			//提交
 			saveGoods() {
 				this.ifload = true;
-				if(!this.checkedSpec[0]){
+				if(this.checkedSpec && !this.checkedSpec[0]){
 					this.checkedSpec.splice(0,1);
 				}
 				this.form.spec_name = JSON.stringify(this.checkedSpec);
@@ -436,7 +436,7 @@
 				this.editLabel = '库存';
 				this.editType = 'stock';
 			},
-			
+
 			//批量修改价格、库存
 			saveEdit() {
 				// console.log(this.checkedSpecValue);
@@ -451,7 +451,7 @@
 						if(v.storage!=undefined && this.editType=='stock'){
 							this.checkedSpecValue[index][i].storage = this.eidtVal;
 							this.form.goods_storage += this.eidtVal*100/100;
-						}						
+						}
 					})
 				})
 				this.editVisible = false;
@@ -463,9 +463,9 @@
 					val.forEach((v,i) =>{
 						if(v.storage!=undefined){
 							this.form.goods_storage += v.storage*100/100;
-						}						
+						}
 					})
-				})				
+				})
 			}
 		}
 	}

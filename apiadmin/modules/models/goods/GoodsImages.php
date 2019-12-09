@@ -28,8 +28,14 @@ class GoodsImages extends GoodsImagesModel
 				->groupBy(['color_id'])
 				->asarray()
 				->all();
-
+				
 		$list = array();
+		if(count($data)<2 && (!$data[0]['goods_spec'] || !$data[0]['color_id']))
+		{
+			$list = array('color_id'=>0,'name'=>'默认','images'=>array(array('image_url'=>$defaultImg)));
+			return array($list);
+		}  
+
 		foreach($data as $k=>$val)
 		{
 			$list[$k]['color_id'] = $val['color_id'];
@@ -66,7 +72,6 @@ class GoodsImages extends GoodsImagesModel
 						Goods::updateAll(array('goods_image'=>$image['image_url']),$condition);   
 					}
 
-
 					$imageModel = clone $this;
 					$imageModel->color_id = $colorId;
 					$imageModel->goods_commonid = $goodsCommonId;					
@@ -84,7 +89,7 @@ class GoodsImages extends GoodsImagesModel
 						$imageModel->isNewRecord = false; 
 						$imageModel->id = $image['id'];			
 						$imageModel->image_url = $image['image_url'];	
-						$imageModel->sort = isset($image['sort'])?$image['sort']:0;	
+						$imageModel->sort = isset($image['sort'])?$image['sort']:0;		
 					}
 
 					if(!$imageModel->validate() || !$imageModel->save()){

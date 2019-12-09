@@ -123,14 +123,17 @@ class GoodsClassController extends CoreController
 	 		if(isset($goodsSpecName[$val['spec_id']]) && $goodsSpecName[$val['spec_id']])
 	 			$val['checked'] = true;
 	 		$specValue = SpecValue::specValueList($val['spec_id']);
-	 		if($specValue)
-	 		{
-		 		foreach($specValue as &$v)
-		 		{
-		 			$v['checked'] = isset($goodsSpecVal[$val['spec_id']])&&$goodsSpecVal[$val['spec_id']][$v['id']]?true:false;
-		 		}	 			
-	 		}
 
+	 		if(!$specValue){
+	 			$val['spec_value'] = $specValue;
+	 			continue;
+	 		}
+	 		
+	 		foreach($specValue as &$v)
+	 		{
+	 			// var_dump(isset($goodsSpecVal[$val['spec_id']]));
+	 			$v['checked'] = isset($goodsSpecVal[$val['spec_id']])&&isset($goodsSpecVal[$val['spec_id']][$v['id']])?true:false;
+	 		}
 	 		$val['spec_value'] = $specValue;
 	 	}
 

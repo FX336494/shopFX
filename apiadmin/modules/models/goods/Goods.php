@@ -24,17 +24,17 @@ class Goods extends GoodsModel
 					$specValTmp = array();
 					foreach($specValue as $val)
 					{
-						if(isset($val['spec_id'])){
+						if($val['spec_id']){
 							$specValTmp[$val['val_id']] = $val['spec_val'];
 						}
 						// var_dump($val);
-						if(isset($val['spec_id']) && $val['spec_id']==1){  //系统默认1为颜色规格
+						if($val['spec_id']==1){  //系统默认1为颜色规格
 							$data['color_id'] = (int)$val['val_id'];
 						}							
-						if(isset($val['price'])){
+						if($val['price']){
 							$data['goods_price'] = $val['price'];
 						}
-						if(isset($val['storage'])){
+						if($val['storage']){
 							$data['goods_storage'] = $val['storage'];
 						}		
 	
@@ -64,13 +64,15 @@ class Goods extends GoodsModel
 			{
 				//是否已经存在
 				$where = ['goods_commonid'=>$goodsData['goods_commonid']];
+
 				$oldGoods = self::getGoods($where,['goods_id']);
+
 				if($oldGoods){
-					$goodsModel->goods_id  = $oldGoods['goods_id'];
-					$goodsModel->isNewRecord = false;
-					$goodsModel[] = $oldGoods['goods_id'];
+					$goodsModel = self::findOne($oldGoods['goods_id']);
 				}else{
-					$this->create_time = time();
+					$goodsModel = $this;
+					$goodsModel->goods_id = 0;	
+					$goodsData['create_time'] = time();
 				}
 
 				$goodsData['color_id'] = 0;
@@ -122,6 +124,7 @@ class Goods extends GoodsModel
    		$goodsData['goods_state'] 			= $commonGoods['goods_state'];  
    		$goodsData['goods_freight'] 		= $commonGoods['goods_freight']; 
    		$goodsData['goods_commend'] 		= $commonGoods['goods_commend'];
+
    		return $goodsData;
     }    
 

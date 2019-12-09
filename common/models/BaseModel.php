@@ -18,6 +18,8 @@ class BaseModel extends \yii\db\ActiveRecord
 	*/
 	public static function queryFormart($model,$where,$params,$whereAnd=array())
 	{
+		$field = ['*'];
+		$order = '';		
 		
 		if(isset($params['field']))
 			$field = $params['field'];
