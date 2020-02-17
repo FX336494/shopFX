@@ -15,7 +15,7 @@
 
     三、项目预览
         后台地址： http://shopfx.admin.tinakj.com/wap/#/page/dashboard
-        手机端
+        手机端： http://shopfx.mobile.tinakj.com/app/#/page/index  请在手机在预览
 ![Image text](https://raw.githubusercontent.com/FX336494/shopFX/master/api/web/assets/qrcode.png)
 
     四、项目交流
