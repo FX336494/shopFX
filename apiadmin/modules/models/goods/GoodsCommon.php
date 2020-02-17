@@ -32,7 +32,7 @@ class GoodsCommon extends GoodsCommonModel
 			$goodsModel = new Goods;
 			$res = $goodsModel->saveGoods($data,$specValueArr);
 			if(!$res['state'])
-				throw new \Exception($res['msg']);
+				throw new \Exception($res['msg'].'111');
 			$transaction->commit();
 
 			return array('state'=>'true','goods_commonid'=>$goodsCommonid);
@@ -91,6 +91,10 @@ class GoodsCommon extends GoodsCommonModel
 			return false;
 		}
 	}
+
+	/*
+	 	* 修改产品
+	*/
 
 
 }

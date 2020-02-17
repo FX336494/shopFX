@@ -24,26 +24,41 @@
                 已评价
               </span>
             </div>
-            <div v-for="(goodsItem,i) in order.goods" :key="i">
-              <div class="goods" v-for="(goods,k) in goodsItem" :key="k">
-                <div class="info">
-                  <div class="img">
-                    <img :src="goods.goods_image" />
-                  </div>
-                  <div class="text">
-                    <p class="name">{{goods.goods_name}}</p>
-                    <p class="price">
-                      <span class="p1"> ￥{{goods.goods_price}}</span>
-                      <span class="num">x{{goods.goods_num}}</span>
-                    </p>
-                  </div>
 
+            <div class="goods" @click="orderDetail(order)" v-for="(goods,k) in order.order_goods" :key="k">
+              <div class="info">
+                <div class="img">
+                  <img :src="goods.goods_image" />
                 </div>
+                <div class="text">
+                  <p class="name">{{goods.goods_name}}</p>
+                  <p class="price">
+                    <span class="p1"> ￥{{goods.goods_price}}</span>
+                    <span class="num">x{{goods.goods_num}}</span>
+                  </p>
+                </div>
+
               </div>
             </div>
+
             <div class="extra">
-              <div>运费：{{order.shipping_fee}}</div>
-              <div>合计：{{order.order_amount}}</div>
+              <div class="desc">
+                <div class="promotion" v-if="order.order_type>'1'">
+                  <span class="type">
+                    {{order.promotion.promotion_text}}
+                  </span>
+                  <span style="color: orangered;" v-show="order.promotion.promotion_desc">
+                    {{order.promotion.promotion_desc}}
+                  </span>
+
+                </div>
+                <div class="total">
+                  <span>运费：{{order.shipping_fee}}</span>
+                  <span>优惠券抵扣：{{order.order_common.coupon_info.coupon_money}}</span>
+                  <span>合计：{{order.order_amount}}</span>
+                </div>
+              </div>
+
               <div class="order_state">
                 <span class="cancel" @click="cancel(order,index)" v-show="order.order_state=='1'">
                   取消订单
@@ -76,7 +91,12 @@
         <loading :ifload="ifload" v-if="isMore"></loading>
       </div>
     </scroll>
-    <pay v-if="showPay" @closePay="selectPay" @payAfter="payAfter" :order_id="payOrder.order_id" :totalFee="payOrder.order_amount">
+    <pay
+      v-if="showPay"
+      @closePay="selectPay"
+      @payAfter="payAfter"
+      :order_id="payOrder.order_id"
+    >
     </pay>
     <fadeAlert :msg="msg" v-if="showAlert" @hideFade="hideFade" :clsType="clsCode">
     </fadeAlert>
@@ -229,6 +249,15 @@
           }
         });
       },
+
+      //订单详情
+      orderDetail(order) {
+        this.$router.push({
+          path: '/page/order/order_detail',
+          query: {order_id: order.order_id,type:'1'}
+        })
+      },
+
       //查看物流
       order_delivery(order) {
         this.$router.push({
@@ -323,14 +352,14 @@
     flex: 5;
     /*background: orange;*/
     text-align: left;
-    padding: 0px;
+    padding: 5px;
   }
 
   .list .item .goods .info .img {
     display: block;
     float: left;
     width: 30%;
-    max-height: 80px;
+    /* max-height: 80px; */
   }
 
   .list .item .goods .info .text {
@@ -367,6 +396,29 @@
   .list .item .extra {
     width: 100%;
     text-align: right;
+  }
+  .list .item .extra .desc{
+    display: flex;
+    width: 100%;
+  }
+  .list .item .extra .desc div{
+    flex: 1;
+  }
+  .list .item .extra .desc .promotion{
+    text-align: left;
+    text-indent: 10px;
+  }
+  .list .item .extra .desc .promotion .type{
+    background: orangered;
+    color:#fff;
+    display: inline-block;
+    text-indent: 0px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .list .item .extra .desc .total span{
+    display: block;
   }
 
   .list .item .extra .order_state {

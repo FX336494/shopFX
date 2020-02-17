@@ -18,7 +18,7 @@ class OrderController extends CoreController
 		$where = $this->formartWhere();
 		$page  = $this->request('page','1');
 		$params = array(
-			'field'	=> ['order_id','buyer_id','buyer_name','buyer_phone','create_time','order_amount','order_state'],
+			'field'	=> ['order_id','buyer_id','buyer_name','buyer_phone','create_time','order_amount','order_state','order_type'],
 			'order' => 'order_id desc',
 			'page'	=> $page,
 			'limit' => $this->request('page_size',10),
@@ -26,7 +26,8 @@ class OrderController extends CoreController
 		$list = Orders::getOrderList($where,$params);
 		$pages = Orders::$pages;
 		$orderState = Yii::$app->params['orderState'];
-		$this->out('订单列表',$list,array('pages'=>$pages,'orderState'=>$orderState));
+		$orderType = Yii::$app->params['orderType'];
+		$this->out('订单列表',$list,array('pages'=>$pages,'orderState'=>$orderState,'orderType'=>$orderType));
 	}
 
 	/*
@@ -60,12 +61,9 @@ class OrderController extends CoreController
 			$this->error('参数错误');
 
 		$where = ['order_id'=>$orderId];
-		$field = ['order_id','goods_amount','order_amount','shipping_fee','order_state','refund_state','order_type'];
+		$field = ['*'];
 		$extend= array('order_goods','order_common');
-
 		$data = Orders::getOrderDetail($where,$field,$extend);
-		$data['order_state_text'] =  Yii::$app->params['orderState'][$data['order_state']];
-		$data['pay_state_text'] = $data['order_state']>=2?'已付款':'未付款';
 		$this->out('订单详情',$data);
 	}
 

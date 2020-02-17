@@ -27,6 +27,16 @@
 							</el-option>
 						</el-select>
 					</el-col>
+					<el-col :span="3">
+						<el-select v-model="search.order_type" placeholder="订单类型">
+							<el-option
+							  v-for="(name,index) in orderTypeText"
+							  :key="index"
+							  :label="name"
+							  :value="index">
+							</el-option>
+						</el-select>
+					</el-col>                    
 					<el-col :span="12">
 						<el-date-picker
 						  v-model="search.date"
@@ -76,6 +86,15 @@
 					label="订单金额"
 					width="100">
 				</el-table-column>
+				<el-table-column
+					prop="order_type"
+					label="订单类型"
+					width="100">
+					<template slot-scope="scope">
+						<span>{{orderTypeText[scope.row.order_type]}}</span>
+					</template>
+				</el-table-column>
+
 				<el-table-column
 					prop="order_state"
 					label="订单状态"
@@ -140,6 +159,7 @@ export default{
 			page_size:10,
 			pages:0,
 			stateText:[], //订单状态描述
+            orderTypeText:[],  //订单类型
 
 			delId:0,
 			delIndex:-1,
@@ -174,6 +194,7 @@ export default{
 					this.list = res.data;
 					this.pages = Number(res.extend.pages);
 					this.stateText = res.extend.orderState;
+                    this.orderTypeText = res.extend.orderType;
 					this.ifload = false;
 				}
 			});

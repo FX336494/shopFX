@@ -57,4 +57,15 @@ class GoodsClassModel extends BaseModel
          return $data;
       }
 
+      //获取所有分类上级
+      public static function getParentClass($gcId,&$list=array())
+      {
+         $class = self::find()->where(['id'=>$gcId])->asarray()->one();
+         if($class){
+            $list[] = $class;
+            if($class['parent_id']>0) self::getParentClass($class['parent_id'],$list);
+         }
+         return array_reverse($list);
+      }
+
 }

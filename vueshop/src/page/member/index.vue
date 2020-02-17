@@ -73,6 +73,10 @@
 							<i class="iconfont icon-wallet"></i>
 							<div>我的钱包</div>
 						</router-link>
+						<router-link tag='div' class="item" :to="{path:'/page/member/my_coupons'}" >
+							<i class="iconfont icon-coupon"></i>
+							<div>我的优惠券</div>
+						</router-link>
 					</div>
 				</div>
 

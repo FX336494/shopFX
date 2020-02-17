@@ -11,6 +11,10 @@ use api\modules\models\order\Cart;
 use common\utils\CommonFun;
 use api\modules\models\goods\Goods;
 use api\modules\models\goods\GoodsCommon;
+use api\modules\models\promotion\PintuanGoods;
+use api\modules\models\promotion\PintuanOpenOrder;
+use api\modules\models\promotion\SeckillGoods;
+use api\modules\models\promotion\Coupons;
 
 class BuyController extends CoreController
 {
@@ -19,6 +23,9 @@ class BuyController extends CoreController
 		购买第一步，生成订单 并支付
 		* cart_ids 购物车ID 以 | 隔开
 		* address_id 收货地址ID
+		* message 留言
+		* buy_type 下单方式 1加入购物车 2立即购买 3拼团购买
+		* freight 运费
 	*/
 	public function actionCreate_order()
 	{
@@ -26,53 +33,48 @@ class BuyController extends CoreController
 		$cartIds = explode('|', $this->request['cart_ids']);
 		$addressId = $this->request['address_id'];  
 		$extra = array('mess'=>$this->request['message']);
+		$freight = $this->request('freight',0);
+		$couponId = $this->request('coupon_id',0);
 
 		//返回商品信息和地址
 		$data = $this->buyCondition($addressId,$cartIds);
 
 		//商品数据格式化
-		$listData = $this->formatGoodsData($data['cart_goods']);
+		$listData = $this->formatGoodsData($data['cart_goods'],$freight);
+
+		//优惠券信息
+		$couponInfo = Coupons::calculateCouponMoney($couponId,$listData);
+		$extra['coupon_info'] = $couponInfo;
 
 		//生成订单
-		$res   = $this->createOrder($listData['list'],$data['address_info'],$extra);
+		$res = $this->createOrder($listData,$data['address_info'],$extra);
 
 		//删除购物车
 		Cart::deleteAll(['in','cart_id',$cartIds]);
 
-		$res['total_fee'] = $listData['total_fee'];
+		$couponMoney = isset($couponInfo['coupon_money'])?$couponInfo['coupon_money']:0;
+		$res['total_fee'] = $listData['order_amount'] - $couponMoney;
 
 		$this->out('下单成功',$res);
 	}
 
 
-	private function formatGoodsData($cartGoods)
+	private function formatGoodsData($cartGoods,$freight)
 	{
 		$list = array();
 		$totalFee = 0;
+		$list['shopping_total'] = $freight;
 		foreach($cartGoods as $goods)
 		{
-
 			$list['goods'][] = $goods;
 			if(isset($list['goods_amount']))
 				$list['goods_amount'] += $goods['goods_price']*$goods['goods_num'];
 			else
 				$list['goods_amount'] = $goods['goods_price']*$goods['goods_num'];
-
-			if(isset($list['shopping_total']))
-				$list['shopping_total'] += $goods['goods_freight'];
-			else
-				$list['shopping_total'] = $goods['goods_freight'];
-
-			if(isset($list['order_amount']))
-				$list['order_amount'] += ($goods['goods_price']*$goods['goods_num'])+$goods['goods_freight'];
-			else
-				$list['order_amount'] = ($goods['goods_price']*$goods['goods_num'])+$goods['goods_freight'];
-
-			$totalFee += ($goods['goods_price']*$goods['goods_num'])+$goods['goods_freight'];
-
 		}	
+		$list['order_amount'] = $list['goods_amount'] + $list['shopping_total'];
 
-		return array('list'=>$list,'total_fee'=>$totalFee);	
+		return $list;
 	}
 
 	//购买条件判断 并处理数据
@@ -83,11 +85,34 @@ class BuyController extends CoreController
 		if(!$addressInfo) $this->error('收货地址有误');
 
 		//库存判断
-		$where = ['in','cart_id',$cartIds];
-		$cartModel = new Cart;
-		$cartGoods = $cartModel->getGoods($where);
-
+		$cartGoods = Cart::getGoods($cartIds);
 		if(!$cartGoods) $this->error('订单已经失效');
+
+		if($this->request('order_type')=='2')
+		{
+			if($this->request('join_order_id')>0)
+			{
+				//判断 此开团订单是否已经完成拼团
+				$openOrder = PintuanOpenOrder::getOpenOrder(['order_id'=>$this->request('join_order_id')]);
+				if(!$openOrder) $this->error('开团订单有误');
+				if($openOrder['state'] == '2')
+					$this->error('此团已完成，请选择其它团');
+				if($openOrder['end_time']<time())
+					$this->error('此团已结束，请选择其它团');
+			}
+		}
+
+		//秒杀  ** 这里默认秒杀只能直接购买
+		if($this->request('order_type')=='3')
+		{
+			$seckillInstance = SeckillGoods::getInstanceByGoods($cartGoods[0]['goods_id']);
+			if($seckillInstance['state']!='1' || $seckillInstance['end_time']<time()){
+				$this->error('此此秒杀已失效');
+			}
+			if($seckillInstance['start_time']>time()){
+				$this->error('此秒杀还未开始');
+			}
+		}
 
 		$list = array();
 		foreach($cartGoods as $goods)
@@ -101,6 +126,7 @@ class BuyController extends CoreController
 		}
 		return array('address_info'=>$addressInfo,'cart_goods'=>$cartGoods);
 	}
+
 
 
 	//生成订单
@@ -128,7 +154,20 @@ class BuyController extends CoreController
 			//更新库存，增加销售
 			$flag = $this->updateGoodsStorage($cartGoods['goods']);
 			if(!$flag) throw new \Exception('库存更新失败');
-			
+
+			if($this->request('order_type')=='2' && $this->request('join_order_id')<=0)
+			{
+				//创建拼团开团订单 这时默认拼团只能购买单个产品
+				if(!$this->createPintuanOpenOrder($cartGoods['goods'][0],$orderId))
+					throw new \Exception("开团订单创建失败");
+			}
+			//更新优惠券
+			if($extra['coupon_info']){
+				//更新优惠券
+				$where = ['id'=>$extra['coupon_info']['coupon_id']];
+				if(!Coupons::updateAll(['state'=>'2','update_time'=>time()],$where))
+					throw new \Exception("优惠券更新失败");
+			}
 
 			$transaction->commit();
 			return array('pay_sn'=>$paySn,'order_id'=>$orderId);
@@ -152,6 +191,8 @@ class BuyController extends CoreController
 		$list['goods_amount'] = $cartGoods['goods_amount'];
 		$list['order_amount'] = $cartGoods['order_amount'];		
 		$list['shipping_fee'] = $cartGoods['shopping_total'];
+		$list['order_type']	 = $this->request('order_type');
+		$list['join_order_id'] = $this->request('join_order_id',0);
 		return $list;
 	}
 
@@ -205,6 +246,7 @@ class BuyController extends CoreController
 		$data['reciver_info']			= json_encode($addressInfo,JSON_UNESCAPED_UNICODE);	
 		$data['reciver_province_id']	= $addressInfo['province_id'];
 		$data['reciver_city_id']		= $addressInfo['city_id'];
+		$data['coupon_info']  			= json_encode($extra['coupon_info']);
 		$flag = $this->db::insert('order_common',$data);
 		return $flag;
 	}
@@ -219,6 +261,36 @@ class BuyController extends CoreController
 				return false;
 		}
 		return true;
+	}
+
+
+	//创建开团订单
+	private function createPintuanOpenOrder($goods,$orderId)
+	{
+		$pintuanInstance = PintuanGoods::getInstanceByGoods($goods['goods_id']);
+		if($pintuanInstance['state']!='1' || $pintuanInstance['end_time']<time()){
+			throw new \Exception("此拼团已失效");
+			return false;
+		}
+		if($pintuanInstance['start_time']>time()){
+			throw new \Exception("此拼团还未开始");
+			return false;
+		}
+		$data = array();
+		$data['order_id'] = $orderId;
+		$data['open_member_id'] = $this->_memberId;
+		$data['goods_id'] = $goods['goods_id'];
+		$data['goods_commonid'] = $goods['goods_commonid'];
+		$data['start_time'] = time();
+		$data['end_time'] = time() + ($pintuanInstance['time_limit']*60); //这里先记录，支付之后再更新
+		$data['open_nums'] = $pintuanInstance['min_nums'];
+		$data['join_nums'] = 1;
+		$data['join_order_ids'] = $orderId;
+		$data['instance_id'] = $pintuanInstance['instance_id'];
+		$model = new PintuanOpenOrder;
+		if($model->load($data,'') && $model->save()) return true;
+		// var_dump($model->errors);
+		return false;
 	}
 
 }

@@ -146,6 +146,11 @@ export default{
 	.goods_list .item .goods_info .goods_name{
 		text-indent: 5px;
 		font-size: 12px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;    
 	}
 	.goods_list .item .goods_info .goods_price{
 		color:#FF0036;

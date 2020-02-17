@@ -20,7 +20,7 @@
 					<div v-for="(spec,specId) in specArr" class="row">
 						<div class="spec-name">{{spec.name}}</div>
 						<div class="spce_val">
-							<div v-for="(val,key) in spec.value">
+							<div v-for="(val,key) in spec.value" :key="key">
 								<span class="val" :class="JSON.stringify(selectedVal).indexOf(key)>-1?'active_val':''" @click="select_spec(specId,val,key)">
 									{{val}}
 								</span>
@@ -53,7 +53,7 @@
 	import scroll from '@/components/common/scroll'
 	import fadeAlert from '@/components/common/fadealert'
 	export default{
-	    props: ['goods','buy_type'],
+	    props: ['goods','buy_type','order_type','join_order_id'],
 	    components:{scroll,fadeAlert},
 		data() {
 			return {
@@ -93,15 +93,14 @@
 		},
 		methods: {
 			_init_data(goods) {
-				this.goodsPrice = goods.goods_price;
+        console.log(goods);
+				this.goodsPrice = goods.promotion_type>0&&goods.promotion_price?goods.promotion_price:goods.goods_price;
 				this.goodsName  = goods.goods_name;
 				this.goodsStorage = goods.goods_storage;
 				this.goodsImage = goods.goods_image;
 			},
 			select_spec(specId,val,specValId) {
-				// console.log(specId,val,specValId);
 				if(this.selectedVal.indexOf(specValId)>0) return false;
-
 				this.$set(this.selectedVal,specId,specValId);
 				this.selectNum = 0;
 				this.selectedVal.forEach((val)=>{
@@ -118,12 +117,9 @@
 				console.log(this.specArr);
 				for(var index in this.specArr)
 				{
-					console.log(this.selectedVal);
 					for(var i in this.specArr[index].value)
 					{
 						if(this.selectedVal[index]==i){
-							// specName[index] = this.specArr[index].name;
-							// specVal[i] = this.specArr[index].value[i]
 							specName.push({[index]:this.specArr[index].name});
 							specVal.push({[i]:this.specArr[index].value[i]});
 							console.log(specVal);
@@ -137,14 +133,15 @@
 			get_default_goods() {
 				post_('goods/goods/get_default_goods',{goods_commonid:this.goods['goods_commonid']},(res)=>{
 					console.log(res);
-					if(res.code>0 || !res.data.id){
+					if(res.code>0 || !res.data.goods_id){
 						this.fadeAlert=true;
 						this.msg = res.msg;
 						return
 					}
-					this.goodsId = res.data.id;
+					this.goodsId = res.data.goods_id;
 				});
 			},
+
 			//获取规格产品
 			get_spec_goods(specName,specVal) {
 				console.log(specName);
@@ -183,22 +180,28 @@
 					goods_id : this.goodsId,
 					nums     : this.nums,
 					buy_type : this.buy_type,
+          order_type:this.order_type,
 				}
-				console.log(param);
-
 				post_('order/cart/add_cart',param,(res)=>{
-					console.log(res);
-					// if(res.code==0 && this.buy_type=='1'){
-					// 	this.$store.state.cartnum += param.nums;
-					// }
-
+          if(res.code!=0){
+            this.showAlert = true;
+            this.msg = res.msg;
+            return ;
+          }
 					if(this.buy_type==2){
-						let param = {cart_ids:res.data.cart_id,ifcart:0,nums:this.nums};
+						let param = {
+              cart_ids:res.data.cart_id,
+              ifcart:0,
+              nums:this.nums,
+              order_type:this.order_type,
+              join_order_id:this.join_order_id,
+            };
 						this.$router.push({path: '/page/order/create_order',query:param});
 					}
 					this.$emit('cartEmit',{msg:res.msg,code:res.code});
 				});
 			},
+      
 			buy_validate() {
 				this.nums = parseInt(this.nums);
 				if(this.selectNum<this.specNum){

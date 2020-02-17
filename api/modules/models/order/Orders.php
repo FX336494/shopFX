@@ -3,7 +3,7 @@ namespace api\modules\models\order;
 use common\models\order\OrdersModel;
 use api\modules\models\order\OrderGoods;
 use Yii;
-
+use api\modules\models\promotion\PintuanOpenOrder;
 
 class Orders extends OrdersModel
 {
@@ -30,15 +30,75 @@ class Orders extends OrdersModel
 
 
 	//支付成功后，更新订单
-	public static function updateOrdersByOrderId($orderId,$params)
+	public static function updateOrdersByOrderId($order,$params)
 	{
 		$data = array(
 			'payment_time'	=> time(),
 			'payment_code'	=> $params['payment_code'],
 			'order_state'	=> '2',
 		);
-		return self::updateAll($data,['order_id'=>$orderId]);
+
+		if($order['order_type']==2)
+		{
+			$data['pintuan_state'] = 1;
+			//更新拼团相关信息
+			$res = self::updatePintuanInfo($order);
+			if(!$res['state']) return false;
+				
+			if($res['data']['state']=='2')
+			{
+				//拼团完成
+				$data['pintuan_state'] = '2';
+				//更新所有参与拼团的订单
+				$where = ['or','join_order_id='.$order['join_order_id'] ,'order_id='.$order['join_order_id']];
+				if(!self::updateAll(['pintuan_state'=>'2'],$where)) return false;
+			}
+		}
+		return self::updateAll($data,['order_id'=>$order['order_id']]);
 	}
+
+
+	/*
+		更新拼团相关数据
+	*/
+	public static function updatePintuanInfo($order)
+	{
+		if($order['join_order_id']>0)
+		{
+			//更新开团订单
+			$where = ['order_id'=>$order['join_order_id']];
+			$openOrder = PintuanOpenOrder::getOpenOrder($where);
+			if(!$openOrder) return ['state'=>false,'msg'=>'开团订单不存在'];
+			$data = array();
+			$data['join_nums'] = $openOrder['join_nums']+1;
+			$data['state'] = '1';
+			$data['join_order_ids'] = $openOrder['join_order_ids'].','.$order['order_id'];
+			if($data['join_nums']==$openOrder['open_nums'])
+			{
+				$data['state'] = '2';
+				$data['complete_time'] = time();
+			}
+			$res = PintuanOpenOrder::updateAll($data,['open_order_id'=>$openOrder['open_order_id']]);
+			if(!$res) return ['state'=>false,'msg'=>'更新开团订单失败'];
+			return ['state'=>true,'msg'=>'ok','data'=>$data];
+		}else
+		{
+			//更新开团订单
+			$where = ['order_id'=>$order['order_id']];
+			$openOrder = PintuanOpenOrder::getOpenOrder($where);
+			$data = array();
+			$data['start_time'] = time();
+			$data['end_time'] = ($openOrder['end_time'] - $openOrder['start_time']) + time();
+			$data['state'] = '1';
+			$data['pay_state'] = '1';
+			$data['join_nums'] = 1;
+			$res = PintuanOpenOrder::updateAll($data,['open_order_id'=>$openOrder['open_order_id']]);
+			if(!$res) return ['state'=>false,'msg'=>'更新开团订单失败'];
+			return ['state'=>true,'msg'=>'ok','data'=>$data];			
+		}
+	}
+
+
 
 	//支付成功后，更新订单
 	public static function updateOrdersByPaysn($paysn,$params)

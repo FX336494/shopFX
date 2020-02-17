@@ -36,14 +36,20 @@
             </carousel>
           </div>
 
+          <div class="name">
+            <p>{{goods.goods_name}}</p>
+          </div>
+          <div class="coupons" v-show="coupons.length" >
+            <span>领券后预计减{{expectMoney}}元</span>
+            <span @click="showCoupons=!showCoupons">领券>></span>
+          </div>
           <div class="goods_info">
-            <div class="name">
-              <p>{{goods.goods_name}}</p>
-            </div>
             <div class="price">
               <span>
-                ￥<b>{{goods.goods_price}}</b>
-                <p class="del">￥{{goods.goods_marketprice}}</p>
+                <b v-show="goods.promotion_type=='1'">拼团价：{{goods.pintuan_price}}</b>
+                <b v-show="goods.promotion_type=='2'">秒杀价：{{seckillInfo.seckill_price}}</b>
+                <p>零售价：{{goods.goods_price}}</p>
+                <p v-show="goods.promotion_type=='0'" class="del">￥{{goods.goods_marketprice}}</p>
               </span>
               <span>销量：{{goods.goods_salenum}}</span>
             </div>
@@ -57,8 +63,39 @@
                 <span>浏览量：{{goods.goods_click}}</span>
               </div>
             </div>
+
+            <div class="seckill" v-show="goods.promotion_type=='2'">
+              <span class="seckill_title">限时秒杀</span>
+              <span class="desc">{{seckillInfo.seckill_text}}</span>
+              <span class="secdown" v-if="seckillInfo.countdown>0">
+                <countdown :endTime="seckillInfo.countdown*1000"></countdown>
+              </span>
+            </div>
+
           </div>
         </div>
+
+        <!-- 开团列表 start -->
+        <div class="open_tuan" v-if="openList.length>0">
+          <div class="item" v-for="(item,i) in openList" :key="i">
+            <div class="user">
+              <img :src="item.member_avatar || defaultAvatar" />
+              <span>{{item.member_name}}</span>
+            </div>
+            <div class="info">
+              <div class="text">
+                <span>还差{{item.open_nums - item.join_nums}}人拼成</span>
+                <!-- <span>{{item.end_time*1000|formatDate('hh点mm分')}}结束</span> -->
+                <span><countdown :endTime="item.end_time*1000"></countdown></span>
+              </div>
+              <div class="op">
+                <button @click="goPintuan(2,2,item.order_id)">去拼单</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 开团列表 end -->
+
 
         <div ref="part2">
           <div class="evaluate_title" ref="evaluate">
@@ -72,9 +109,10 @@
                 <i class="iconfont icon-right"></i>
               </span>
             </div>
-
           </div>
         </div>
+
+
         <div ref="part3">
           <div class="detail_title" ref="detail">
             <p><i class="iconfont icon-xiangqing"></i>商品详情</p>
@@ -82,12 +120,12 @@
           <div id="goods_detail">
             <div v-html="goods.goods_body"></div>
           </div>
-
         </div>
 
-        <!-- <div style="height:50px;"></div> -->
+
       </div>
     </scroll>
+
     <div class="footer_cart">
       <div class="rows others">
         <div class="item" @click="collect" :class="goods.is_collect=='1'?'active':''">
@@ -97,19 +135,54 @@
         </div>
         <div class="item" @click="to_cart">
           <i class="iconfont icon-gouwuche">
-            <!-- <span class="nums">{{$store.state.cartnum}}</span> -->
           </i>
           <br />
           <span class="text">购物车</span>
         </div>
       </div>
-      <div class="rows cart" @click="joinCart">加入购物车</div>
-      <div class="rows buy" @click="buyNow">立即购买</div>
+
+      <!-- 普通购买 -->
+      <div v-if="goods.promotion_type=='0'" class="rows cart" @click="buyNow(1,1)">
+        加入购物车
+      </div>
+      <div v-if="goods.promotion_type=='0'" class="rows buy" @click="buyNow(2,1)">
+        立即购买
+      </div>
+
+      <!-- 拼团的购买 -->
+      <div v-if="goods.promotion_type=='1'" class="rows cart" @click="buyNow(2,1)">
+        单独购买
+      </div>
+      <div v-if="goods.promotion_type=='1'" class="rows buy" @click="buyNow(2,2)">
+        发起拼团
+      </div>
+
+      <!-- 秒杀购买 -->
+      <div v-if="goods.promotion_type=='2'" class="rows buy" @click="buyNow(2,3)">
+        立即秒杀
+      </div>
+
     </div>
 
+
     <!-- 规格组件 -->
-    <specSelect v-if="showCart" @hiddenSpec="hiddenSpec" @cartEmit="cartAfer" :buy_type="buyType" :goods="goods">
+    <specSelect
+      v-if="showCart"
+      @hiddenSpec="hiddenSpec"
+      @cartEmit="cartAfer"
+      :buy_type="buyType"
+      :order_type="orderType"
+      :join_order_id="joinOrderId"
+      :goods="goods">
     </specSelect>
+
+    <!-- 优惠券 -->
+    <coupons
+      v-if="showCoupons"
+      :couponsData="coupons"
+      @success="getSuccess"
+      @closeCoupons="showCoupons=false"
+    ></coupons>
 
     <fadeAlert :msg="msg" v-if="showAlert" @hideFade="showAlert=false" :clsType="clsCode"></fadeAlert>
     <loading :ifload="ifload"></loading>
@@ -123,15 +196,19 @@
   import carousel from '@/components/common/carousel'
   import fadeAlert from '@/components/common/fadealert'
   import specSelect from '@/components/goods/spec_select'
+  import coupons from '@/components/goods/coupons'
   import loading from '@/components/common/loading'
+  import countdown from '@/components/common/countdown'
   import Vue from 'vue'
   export default {
     components: {
       scroll,
       carousel,
       specSelect,
+      coupons,
       fadeAlert,
-      loading
+      loading,
+      countdown
     },
     data() {
       return {
@@ -144,11 +221,19 @@
         BSstyle: "position:absolute;top:0;bottom:50px;left:0px;width:100%;overflow:hidden;",
         titleTab: 1,
         showCart: false,
+        showCoupons:false,
         buyType: 1, //购买方式 1 加入购物车 2直接购买
+        orderType:1, //1 普通购买 2拼团 3秒杀
+        joinOrderId:0,  //加入的拼团订单id
         msg: '加入购物车成功',
         showAlert: false,
         clsCode: 1,
         ifload: true,
+        openList:[], //开团列表
+        defaultAvatar:require('../../assets/user.jpg'),
+        seckillInfo:[], //秒杀信息
+        coupons:[], //优惠券信息
+        expectMoney:0,
       }
     },
     created() {
@@ -169,18 +254,24 @@
           console.log(res);
           this.ifload = false;
           this.goods = res.data;
+          this.openList = res.extend.open_list;
+          this.seckillInfo = res.extend.seckill_info;
+          this.coupons = res.extend.coupons;
+          this.expectMoney = this.coupons[0]?this.coupons[0].expect_money:0;
           res.data.images.forEach((val) => {
             this.productImgs.push(val.image_url);
           });
         });
       },
       scroll(pos, maxScrollY) {
-        //头部样式控制
+        // 头部样式控制
         this.contentStyle(pos);
       },
+
+      //头部样式控制
       contentStyle(pos) {
         let posY = Math.abs(pos.y);
-        // console.log(posY);
+        //console.log(posY);
         if (pos.y <= -0) {
           let showVal = 0.005 * posY;
           this.$refs.goods_nav.style.opacity = showVal;
@@ -211,13 +302,21 @@
           this.$refs.scroll.scrollToElement(this.$refs.detail, 1, false, -90)
         }
       },
-      joinCart() {
-        this.buyType = 1;
+
+      //立即购买
+      buyNow(buyType,orderType) {
+        this.buyType = buyType;
+        this.orderType = orderType;
+        console.log(orderType);
         this.showCart = !this.showCart;
       },
-      buyNow() {
-        this.buyType = 2;
-        this.showCart = true;
+
+      //参与拼团
+      goPintuan(buyType,orderType,joinOrderId) {
+        this.buyType = buyType;
+        this.orderType = orderType;
+        this.showCart = !this.showCart;
+        this.joinOrderId = joinOrderId;
       },
       hiddenSpec() {
         this.showCart = false
@@ -232,6 +331,7 @@
       to_cart() {
         this.$router.push('/page/order/cart_list')
       },
+      //收藏
       collect() {
         let oldCollet = this.goods.is_collect;
         this.$post_('goods/goods/favorites_goods', {goods_commonid: this.goodsCommonid}, (res) => {
@@ -251,7 +351,11 @@
             goods_commonid: this.goodsCommonid
           }
         });
-      }
+      },
+      //优惠券领取成功
+      getSuccess() {
+        this._getGoodsInfo();
+      },
     },
   }
 </script>
@@ -264,6 +368,7 @@
   .wrappers {
     width: 100%;
     height: 100%;
+    background: #f0f0f0;
   }
 
   .wrappers .header {
@@ -335,6 +440,7 @@
     /*height: 100%;*/
     margin: 0;
     padding: 0;
+    background: #F0F0F0;
     /*border:3px solid green;	*/
   }
 
@@ -346,23 +452,52 @@
   }
 
   .content .goods_info {
-    margin-top: 10px;
+    margin-top: -2px;
     border-top: 1px solid #f0f0f0;
     padding-top: 8px;
     text-align: left;
     text-indent: 15px;
     padding-bottom: 10px;
+    background: #FF0036;
+  }
+  .content  .name{
+    text-align: left;
+    /* text-indent: 15px; */
+    padding-top: 10px;
+    font-size: 18px;
+    background: #fff;
+    padding: 10px;
+  }
+  .content .coupons{
+    background: #FF0036;
+    color:#fff;
+    line-height: 40px;
+    height: 40px;
+    display: flex;
+  }
+  .content .coupons span{
+    display: block;
+    flex: 1;
+  }
+  .content .coupons span:first-child{
+    text-align: left;
+    padding-left: 20px;
+  }
+  .content .coupons span:last-child{
+    text-align: right;
+    padding-right: 20px;
+    letter-spacing: 2px;
   }
 
   .content .goods_info .price {
     width: 100%;
     display: flex;
-    color: orange;
+    color: #fff;
   }
 
   .content .goods_info .price .del {
     text-decoration: line-through;
-    color: #888;
+    color: #ddd;
     font-size: 12px;
   }
 
@@ -373,18 +508,19 @@
   }
 
   .content .goods_info .price span b {
-    font-size: 20px;
+    font-size: 14px;
   }
 
   .content .goods_info .price span:last-child {
     text-align: right;
     padding-right: 15px;
-    color: #000;
+    color: #fff;
   }
 
   .content .goods_info .extra {
     width: 100%;
     display: flex;
+    color:#fff;
     /*text-align: center;*/
   }
 
@@ -396,6 +532,75 @@
   .content .goods_info .extra div:last-child {
     padding-right: 15px;
     text-align: right;
+  }
+
+  .open_tuan{
+    margin-top: 10px;
+    width: 100%;
+    background: #fff;
+    padding: 10px;
+  }
+  .open_tuan .item{
+    width: 100%;
+    display: flex;
+    text-align: left;
+    margin-bottom: 5px;
+    padding: 3px 0px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .open_tuan .item div{
+    flex: 1;
+  }
+  .open_tuan .item img{
+    width: 60px;
+    border-radius: 50%;
+  }
+
+  .open_tuan .item .info{
+    display: flex;
+  }
+  .open_tuan .item .info div{
+    flex: 1;
+  }
+  .open_tuan .item .info div:first-child{
+    flex: 2;
+  }
+  .open_tuan .item .info .text{
+    text-align: right;
+  }
+  .open_tuan .item .info .text span{
+    display: block;
+  }
+  .open_tuan .item .info .op{
+    text-align: center;
+    margin-top: 7px;
+  }
+  .open_tuan .item .info .op button{
+    border:none;
+    background: #F02D2D;
+    color:#fff;
+    padding: 4px 7px;
+    border-radius: 6px;
+  }
+
+  .seckill{
+    margin-top: 15px;
+  }
+  .seckill .seckill_title{
+    background: orange;
+    color:#fff;
+    display: inline-block;
+    padding: 4px 8px;
+    text-indent: 0px;
+    border-radius: 8px;
+  }
+  .seckill .desc{
+    color:#fff;
+    font-size: 12px;
+  }
+  .seckill .secdown{
+    display: inline-block;
+    color:#fff;
   }
 
   .evaluate_title {
@@ -412,6 +617,7 @@
     text-indent: 10px;
     font-size: 14px;
     line-height: 30px;
+    background: #fff;
   }
 
   .evaluate_content .title {

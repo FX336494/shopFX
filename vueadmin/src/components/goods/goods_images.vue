@@ -24,6 +24,7 @@
 								<div class="upload">
 									<upload
 										:size='32'
+                                        :uploadType="'2'"
 										:params="{index:index}"
 										@showImg="showImg">
 									</upload>

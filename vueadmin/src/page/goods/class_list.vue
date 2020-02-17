@@ -55,7 +55,7 @@
                   </el-select>
                 </el-form-item>
                 <el-form-item label="图标">
-                    <span><upload :size="32" @showImg="showImg"></upload></span>
+                    <span><upload :size="32" :uploadType="'2'" @showImg="showImg"></upload></span>
                     <img :src="form.img" v-show="form.img" style="width:32px;">
                 </el-form-item>
                 <el-form-item label="描述">
@@ -147,10 +147,10 @@
                 this.form.type_id = 0;
                 this.form.desc = '';
                 this.form.index_menu = '0';
-                this.img = '';
-                this.parent_id = 0;
+                this.form.id = 0;
+                this.form.img = '';
+                this.form.parent_id = 0;
                 this.idx = -1;
-                this.id = 0;
                 this.editVisible = true;
             },
 
@@ -210,8 +210,15 @@
             //添加字菜单
             addSub(index,row){
                 this.form.parent_id = row.id;
-                this.id = 0;
-                this.handleAdd();
+                this.form.id = 0;
+                this.form.category_name = '';
+                this.form.type_id = 0;
+                this.form.desc = '';
+                this.form.index_menu = '0';
+                this.form.id = 0;
+                this.form.img = '';
+                this.idx = -1;
+                this.editVisible = true;
             },
             showImg(imgUrl) {
                 this.form.img = imgUrl;

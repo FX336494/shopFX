@@ -21,7 +21,7 @@ class GoodsCommonModel extends BaseModel
 		return [
 			[['goods_name','gc_id','gc_id1','goods_image','goods_storage','goods_price'],'required'],
 			[['goods_name','goods_image','spec_name','spec_value','goods_body','mobile_body'],'string'],
-			[['type_id','gc_id','gc_id1','gc_id2','gc_id3','goods_storage','goods_state','create_time','goods_commend'],'integer'],
+			[['type_id','gc_id','gc_id1','gc_id2','gc_id3','goods_storage','goods_state','create_time','update_time','goods_commend','promotion_type'],'integer'],
 			[['goods_price','goods_marketprice','goods_costprice','goods_freight','goods_storage_alarm'],'number'],
 		];
 	}	
@@ -39,21 +39,25 @@ class GoodsCommonModel extends BaseModel
             'goods_image' => '商品主图',
             'goods_price' => '商品价格',
             'goods_storage' => '商品库存',
+            'promotion_type' => '商品类型',
         ];
     }
 
 
 	/*
 		* 商品列表 （通用）
-		* where 条件
+		* whereArr 条件
 		* params 基本参数 包含 field order page limit
 		* extends  扩展信息 一些与产品相关的信息
 		* 
 	*/
-	public static function goodsList($where,$params=array(),$extend=array())
+	public static function goodsList($whereArr,$params=array(),$extend=array())
 	{
+		$where = isset($whereArr['where'])?$whereArr['where']:[];
+		$and = isset($whereArr['and'])?$whereArr['and']:[];
+
 		$model  = self::find();
-		$models = self::queryFormart($model,$where,$params);
+		$models = self::queryFormart($model,$where,$params,$and);
 		$model  = $models['model'];
 		self::$pages = $models['pages'];
 
@@ -85,7 +89,6 @@ class GoodsCommonModel extends BaseModel
 	{
 		$data = self::find()->select($field)->where($where)->asarray()->one();
 		return $data;
-
 	}
 
 

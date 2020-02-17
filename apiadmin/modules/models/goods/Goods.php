@@ -24,27 +24,29 @@ class Goods extends GoodsModel
 					$specValTmp = array();
 					foreach($specValue as $val)
 					{
-						if($val['spec_id']){
+						if(isset($val['spec_id'])){
 							$specValTmp[$val['val_id']] = $val['spec_val'];
 						}
 						// var_dump($val);
-						if($val['spec_id']==1){  //系统默认1为颜色规格
+						if(isset($val['spec_id']) && $val['spec_id']=='1'){  //系统默认1为颜色规格
 							$data['color_id'] = (int)$val['val_id'];
 						}							
-						if($val['price']){
+						if(isset($val['price'])){
 							$data['goods_price'] = $val['price'];
 						}
-						if($val['storage']){
+						if(isset($val['storage'])){
 							$data['goods_storage'] = $val['storage'];
 						}		
 	
 					}
+
 					$valueName = implode(' ',array_values($specValTmp));
 					$data['goods_name'].= ' '.$valueName;
 					$data['goods_spec'] = json_encode($specValTmp,JSON_UNESCAPED_UNICODE);
 					//是否已经存在
 					$where = ['goods_commonid'=>$data['goods_commonid'],'goods_spec'=>$data['goods_spec']];
 					$oldGoods = self::getGoods($where,['goods_id']);
+
 					if($oldGoods){
 						$goodsModel->goods_id  = $oldGoods['goods_id'];
 						$goodsModel->isNewRecord = false;
@@ -58,7 +60,10 @@ class Goods extends GoodsModel
 						$errors = $this->getErrors();
 						$error =  self::outError($errors);
 						throw new \Exception($error['msg']);
+					}else{
+						$goodsIds[] = $goodsModel->goods_id;
 					}
+					
 				}
 			}else
 			{
@@ -120,7 +125,7 @@ class Goods extends GoodsModel
    		$goodsData['goods_storage']         = $commonGoods['goods_storage'];
    		$goodsData['goods_storage_alarm'] 	= $commonGoods['goods_storage_alarm'];
    		$goodsData['goods_image'] 			= $commonGoods['goods_image'];
-   		$goodsData['goods_edittime'] 		= time();   
+   		$goodsData['update_time'] 			= time();   
    		$goodsData['goods_state'] 			= $commonGoods['goods_state'];  
    		$goodsData['goods_freight'] 		= $commonGoods['goods_freight']; 
    		$goodsData['goods_commend'] 		= $commonGoods['goods_commend'];
@@ -154,7 +159,7 @@ class Goods extends GoodsModel
     			$tmp = array();
     			$tmp['val_id']  = (String)$valId;
     			$tmp['spec_val'] = $nameVal;
-    			$tmp['spec_id'] = (String)$specValueArr[$valId];
+    			$tmp['spec_id'] = $specValueArr?(String)$specValueArr[$valId]:'';
     			$goodsSpecList[] = $tmp;
     		}
     		$goodsSpecList[] = array('price'=>$val['goods_price']);

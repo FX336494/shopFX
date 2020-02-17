@@ -41,7 +41,7 @@
         BSstyle: "position:absolute;top:40px;bottom:0px;left:0px;width:100%;overflow:hidden;background:#f0f0f0;",
         dataList: [],
         page: 1,
-        pageSize: 2,
+        pageSize: 20,
         more: true,
       }
     },

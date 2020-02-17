@@ -25,17 +25,22 @@ class GoodsImages extends GoodsImagesModel
 		$data = Goods::find()
 				->select(['goods_spec','color_id'])
 				->where(['goods_commonid'=>$goodsCommonId])
+				->andWhere(['>','color_id',0])
 				->groupBy(['color_id'])
 				->asarray()
 				->all();
-				
+
 		$list = array();
-		if(count($data)<2 && (!$data[0]['goods_spec'] || !$data[0]['color_id']))
-		{
-			$list = array('color_id'=>0,'name'=>'默认','images'=>array(array('image_url'=>$defaultImg)));
+		if(!$data || !count($data)){
+			$list = array('color_id'=>0,'name'=>'默认');
+			$images = self::getColorImages($goodsCommonId,0);
+			if($images)
+				$list['images'] = $images;
+			else
+				$list['images'] = array(array('image_url'=>$defaultImg));
 			return array($list);
 		}  
-
+		
 		foreach($data as $k=>$val)
 		{
 			$list[$k]['color_id'] = $val['color_id'];
@@ -71,6 +76,7 @@ class GoodsImages extends GoodsImagesModel
 						$condition = ['goods_commonid'=>$goodsCommonId,'color_id'=>$colorId];					
 						Goods::updateAll(array('goods_image'=>$image['image_url']),$condition);   
 					}
+
 
 					$imageModel = clone $this;
 					$imageModel->color_id = $colorId;

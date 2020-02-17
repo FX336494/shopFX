@@ -34,6 +34,10 @@
                             <el-col :span="12">
                                 <div class="item">订单状态：{{order.order_state_text}}</div>
                                 <div class="item">支付状态：{{order.pay_state_text}}</div>
+                                <div class="item">订单类型：{{order.order_type_text}}</div>
+                                <div class="item" v-show="order.order_type=='2'">
+                                    拼团状态：{{order.pintuan_state_text}}
+                                </div>
                             </el-col>
                         </el-row>
                     </el-card>
@@ -64,7 +68,7 @@
                 </el-row>
             </div>
 
-            <div class="delivery" v-show="order.order_state=='2'">
+            <div class="delivery" v-show="order.is_deliver=='1'">
                 <el-row>
                     <h4>发货设置</h4>
                     <el-col :span="14">
@@ -149,6 +153,7 @@
                     if (res.code == '0') {
                         this.$message.success(res.msg);
                         this.order.order_state = '3';
+                        this.getData();
                     } else {
                         this.$message.error(res.msg);
                     }

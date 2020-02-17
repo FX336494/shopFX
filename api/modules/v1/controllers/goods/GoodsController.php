@@ -7,6 +7,10 @@ use api\modules\models\goods\Favorites;
 use api\modules\models\goods\Category;
 use api\modules\models\goods\GoodsBrowse;
 use api\modules\models\order\Evaluate;
+use api\modules\models\promotion\PintuanGoods;
+use api\modules\models\promotion\PintuanOpenOrder;
+use api\modules\models\promotion\SeckillGoods;
+use api\modules\models\promotion\CouponsInstance;
 use Yii;
 /*
 	产品相关控制器
@@ -37,7 +41,9 @@ class GoodsController extends CoreController
 	*/
 	private function goodsWhere($params)
 	{
-		$where = [];
+		$whereArr = $where = $and = [];
+		$where['promotion_type'] = '0';
+		$where['goods_state'] = '1';
 		//分类查询
 		if(isset($this->request['cate_id']))
 		{
@@ -49,14 +55,16 @@ class GoodsController extends CoreController
 					$catesId[] = $child['id'];
 				}
 			}
-			$where = ['in','gc_id',$catesId]; 
+			$and[] = ['in','gc_id',$catesId]; 
 		}
 
 		if(isset($this->request['keyword']))
 		{
-			$where = ['like','goods_name',$this->request['keyword']]; 
+			$and[] = ['like','goods_name',$this->request['keyword']]; 
 		}
-		return $where;
+		$whereArr['where'] = $where;
+		$whereArr['and'] = $and;
+		return $whereArr;
 	}
 
 
@@ -75,12 +83,39 @@ class GoodsController extends CoreController
 		$goodsData['is_collect'] = Favorites::isFovarites($goodsCommonid,$this->_memberId);
 		//增加访问量
 		GoodsCommon::addGoodsViews($goodsCommonid,$this->_memberId); 
-
 		//获取产品评价
 		$ealuateNums = Evaluate::goodsEvaluateCount($goodsCommonid);
 		$goodsData['evaluate_nums'] = $ealuateNums;
 
-		$this->out('商品详情',$goodsData);
+		//拼团信息
+		$extend = array('open_list'=>[]);
+		if($goodsData['promotion_type']=='1')
+		{
+			$pintuanGoods = PintuanGoods::getMinPintuanGoods($goodsCommonid);
+			if($pintuanGoods) $goodsData['pintuan_price'] = $pintuanGoods['pintuan_price'];
+			$extend['open_list'] = PintuanOpenOrder::pintuanOpenOrderList($goodsCommonid);
+		}
+
+		//秒杀
+		$extend['seckill_info'] = [];
+		if($goodsData['promotion_type']=='2')
+		{
+			$seckillGoods = SeckillGoods::getMinSeckillGoods($goodsCommonid);
+			if($seckillGoods)  $extend['seckill_info'] = $seckillGoods;
+		}	
+
+		//获取优惠券信息
+		$params = array(
+			'goods_commonid' => $goodsCommonid,
+			'gc_id1' => $goodsData['gc_id1'],
+			'gc_id2' => $goodsData['gc_id2'],
+			'gc_id3' => $goodsData['gc_id3'],
+			'goods_price' => $goodsData['goods_price'],
+			'member_id' => $this->_memberId,
+		);
+		$extend['coupons'] = CouponsInstance::memberCouponsInGoods($params);
+
+		$this->out('商品详情',$goodsData,$extend);
 
 	}
 
@@ -111,6 +146,11 @@ class GoodsController extends CoreController
 		if(!$goodsCommonid) $this->error('商品不存在');		
 
 		$goods = Goods::getDefaultGoods($goodsCommonid);
+		if($goods['promotion_type']>=0)
+		{
+			$goods['promotion_price'] = Goods::getGoodsPromotionPrice($goods);
+		}
+
 		$this->out('产品信息',$goods);
 	}
 
@@ -135,13 +175,17 @@ class GoodsController extends CoreController
 			foreach($val as $k=>$v){
 				$newspecVal[$k] = $v;
 			}
-		}		
+		}
 
 		$where = [];
 		$where['goods_commonid'] = $goodsCommonid;
 		$where['spec_name'] = json_encode($newSpecName,JSON_UNESCAPED_UNICODE);
 		$where['goods_spec'] = json_encode($newspecVal,JSON_UNESCAPED_UNICODE);
 		$goods = Goods::getGoods($where);
+		if($goods['promotion_type']>=0)
+		{
+			$goods['promotion_price'] = Goods::getGoodsPromotionPrice($goods);
+		}
 		$this->out('产品信息:',$goods);
 	}
 

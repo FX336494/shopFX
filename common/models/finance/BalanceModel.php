@@ -19,7 +19,7 @@ class BalanceModel extends BaseModel
 		return [
 			[['member_id','balance_type','balance','total_balance'],'required'],
 			[['is_tixian','is_transfer'],'string'],
-			[['balance','total_balance','use_balance'],'double'],
+			[['balance','total_balance','use_balance'],'number'],
 			[['member_id','create_time','update_time','end_time'],'integer'],
 		];
 	}
@@ -29,8 +29,9 @@ class BalanceModel extends BaseModel
      	获取帐本余额
      	* memberId 会员ID
      	* bType 账本类型
+      ifIn 类内部 调用 
    	*/	
-    public static function getBalance($memberId,$bType)
+    public static function getBalance($memberId,$bType,$ifIn = false)
     {
         $data = (new Query)
 		            ->select("a.*,b.type_name")
@@ -38,7 +39,8 @@ class BalanceModel extends BaseModel
 		            ->leftJoin('balance_type as b','a.balance_type=b.type')
 		            ->where(['a.member_id'=>$memberId,'a.balance_type'=>$bType])
 		            ->one();
-        if(!$data){
+
+        if(!$data && !$ifIn){
             $res = self::balanceTypeName(1);
             if(!$res) return $data;
             $data = ['type_name'=>$res['type_name'],'balance_type'=>$res['type'],'balance'=>0];
@@ -61,10 +63,12 @@ class BalanceModel extends BaseModel
     public static function addBalance($mid,$btype,$totalFee,$sType='',$sourceId=0,$from='',$reback=false)
     {
     	  if($totalFee<=0) return array("state"=>false,"msg"=>'金额不能小于0');
-    	  $curBalance = self::getBalance($mid,$btype);
+    	  $curBalance = self::getBalance($mid,$btype,true);
+
         if(!$curBalance)
         {
            $res = self::createNewBalance($mid,$btype);
+
            if(!$res['state']) return array("state"=>false,"msg"=>$res['msg']); 
            $curBalance = $res['cur_balance'];
         } 
@@ -102,7 +106,7 @@ class BalanceModel extends BaseModel
     {
         if($totalFee<=0) return array("state"=>false,"msg"=>'金额不能小于0');
 
-        $curBalance =self::getBalance($mid,$btype); 
+        $curBalance =self::getBalance($mid,$btype,true); 
         if(!$curBalance)
             return array('state'=>0,'msg'=>'帐本不存在');
 

@@ -12,6 +12,7 @@ use api\modules\models\order\OrderGoods;
 use api\modules\models\order\OrderCommon;
 use api\modules\models\goods\GoodsCommon;
 use common\utils\Kdniao;
+use api\modules\models\promotion\Coupons;
 
 class OrderController extends CoreController
 {
@@ -23,22 +24,17 @@ class OrderController extends CoreController
 
 	public function actionOrder_list()
 	{
-		$page = $this->request('page',1);
-		$perpage = $this->request('perpage',10);
-		$state = $this->request('state');
 		$orderBy = 'order_id DESC';
+		if($this->request('state')>=2) $orderBy = 'payment_time DESC';
+	
+		$whereArr = $this->formatWhere();
+		$params = array(
+			'page'	=> $this->request('page',1),
+			'limit' => $this->request('perpage',10),
+			'order'	=> 'order_id DESC',
+		);	
 
-		$where = [];
-		$where['buyer_id'] = $this->_memberId; 
-		if($state) $where['order_state'] = $state;
-		if($state>=2) $orderBy = 'payment_time DESC';
-		if($state==4) $where['evaluation_state'] = '0';
-		$field 	= ['order_id','buyer_id','goods_amount','shipping_fee','order_amount','order_state','pay_sn','evaluation_state'];
-		$offset = ($page-1)*$perpage;
-		$orders = Orders::getOrders($where,$field,$offset,$perpage,$orderBy);
-
-		//获取产品信息
-		$orders = $this->getOrderGoods($orders);
+		$orders = Orders::getOrderList($whereArr,$params,['promotion','order_goods','order_common']);
 
 		//订单状态
 		$stateText = Yii::$app->params['orderState'];
@@ -46,19 +42,18 @@ class OrderController extends CoreController
 		$this->out('订单列表',$orders,array('stateText'=>$stateText));
 	}
 
-
-	//获取产品信息
-	private function getOrderGoods($orders)
+	private function formatWhere()
 	{
-		$list = array();
-		$field = ['goods_id','goods_name','goods_price','goods_num','goods_image','goods_spec'];
-		foreach($orders as $order)
-		{
-			$goods = OrderGoods::getOrderGoods($order['order_id'],$field);
-			$order['goods'][] = $goods;
-			$list[] = $order;
-		}
-		return $list;
+		$whereArr = $where = $and = array();
+
+		$state = $this->request('state');
+		$where['buyer_id'] = $this->_memberId; 
+		if($state) $where['order_state'] = $state;
+		if($state==4) $where['evaluation_state'] = '0';
+
+		$whereArr['where'] = $where;
+		$whereArr['and'] = $and;
+		return $whereArr;
 	}
 
 
@@ -75,8 +70,8 @@ class OrderController extends CoreController
 		$transaction = Yii::$app->db->beginTransaction();
 
 		try{
-			$field = ['goods_id','goods_num'];
-			$goods = OrderGoods::getOrderGoods($orderId,$field);
+			$orderInfo = Orders::getOrderDetail(['order_id'=>$orderId],['*'],['order_goods','order_common']);
+			$orderGoods = $orderInfo['order_goods'];
 			//删除订单
 			$where = ['order_id'=>$orderId,'buyer_id'=>$this->_memberId];
 			if(!Orders::deleteAll($where)) throw new \Exception("订单删除失败");
@@ -84,11 +79,21 @@ class OrderController extends CoreController
 			if(!OrderCommon::deleteAll(['order_id'=>$orderId])) throw new \Exception("订单common删除失败");
 
 			//更新销量 和 库存
-			foreach($goods as $val)
+			foreach($orderGoods as $val)
 			{
 				if(!GoodsCommon::updateStorage($val['goods_id'],$val['goods_num'],'0'))
 					throw new \Exception("库存更新失败");
 			}
+
+			//退回优惠券
+			$orderCommon = $orderInfo['order_common'];
+			$couponInfo = json_decode($orderCommon['coupon_info'],1);
+			if($couponInfo){
+				$where = ['id'=>$couponInfo['coupon_id']];
+				if(!Coupons::updateAll(['state'=>'1','update_time'=>time()],$where))
+					throw new \Exception("优惠券更新失败");
+			}
+
 			$transaction->commit();
 			$this->out('取消成功');
 
@@ -96,7 +101,6 @@ class OrderController extends CoreController
 			$transaction->rollBack();
 			$this->error($e->getMessage());				
 		}	
-
 	}
 
 	//确认收货
@@ -143,9 +147,9 @@ class OrderController extends CoreController
 	//获取单个订单信息
 	public function actionGet_order_info()
 	{
-		if(!$orderId = $this->request('order_id'))
-			$this->error('参数错误');		
-		$field = ['order_id'];
+		if(!$orderId = $this->request('order_id')) $this->error('参数错误');	
+				
+		$field = ['*'];
 		$where = ['order_id'=>$orderId];
 		$extend = array();
 		$extend[] = array(		
@@ -153,8 +157,15 @@ class OrderController extends CoreController
 			'field' => array('goods_id','goods_name','goods_price','goods_num','goods_image','goods_spec'),
 		);
 		$order = Orders::getOrderInfo($where,$field,$extend);
+		$order['state_text'] = Yii::$app->params['orderState'][$order['order_state']];
+		$order['order_type_text'] = Yii::$app->params['orderType'][$order['order_type']];
+
+		$orderCommon = OrderCommon::getOrderCommon($orderId,['reciver_info','coupon_info']);
+		$order['reciver_info'] = $orderCommon['reciver_info'];
+		$order['coupon_info'] = $orderCommon['coupon_info'];
 		$this->out('订单信息',$order);
 	}
+
 
 
 }

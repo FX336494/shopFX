@@ -62,7 +62,6 @@ import loading from '@/components/common/loading'
 export default{
 	props:{
 		order_id:'',  //订单ID
-		totalFee:0, //支付金额
 	},
 	components: {
       	fadeAlert,loading
@@ -77,34 +76,52 @@ export default{
 			payPass:'',
 			platPay:false, //平台钱包支付方式
 			payType:'',
+      bType:1,
+      totalFee:0,
 		}
 	},
 	created() {
-
-	},
-	mounted() {
-
+    this.$nextTick(()=>{
+      this.getPayOrderInfo();
+    })
 	},
 	methods:{
-		pay(payType) {
 
+    //获取订单支付信息
+    getPayOrderInfo() {
+      post_('order/payment/get_pay_order_info',{order_id:this.order_id},(res)=>{
+         if(res.code=='0'){
+           this.totalFee = res.data.total_fee;
+         }else{
+           this.showAlert = true;
+           this.msg = res.msg;
+         }
+      });
+    },
+
+		pay(payType) {
 			this.payType = payType;
 			if(payType=='balance'){
 				this.platPay = true;
+        this.bType = 1;
 				return true;
-			}
-      this.msg = '此支付暂未开通';
-      this.showAlert = true;
+			}else{
+        //第三方支付
+        this.thirdPay();
+      }
 		},
+
+    //关闭支付
 		close_type(){
 			this.$emit('closePay')
 		},
+
 		platPayClose() {
       this.$emit('closePay')
 			this.platPay = !this.platPay;
 			this.$router.push({path: '/page/order/order_list',query:{type:'1'}});
 		},
-		//余额支付
+		//积分支付
 		balance_pay() {
 			if(!this.pay_validate()) return false;
       this.ifload = true;
@@ -112,7 +129,7 @@ export default{
 				paypass:this.payPass,
 				total_fee:this.totalFee,
 				order_id:this.order_id,
-				btype:1,
+				btype:this.bType,
 			}
 			console.log(params);
 			post_('order/payment/balance_pay',params,(res)=>{
@@ -126,9 +143,13 @@ export default{
 					this.$emit('payAfter');
 				}
 			});
-
-
 		},
+
+    //第三方支付
+    thirdPay() {
+      this.msg = '此支付暂未开通';
+      this.showAlert = true;
+    },
 
 		pay_validate() {
 			if(!this.totalFee || this.totalFee<=0){

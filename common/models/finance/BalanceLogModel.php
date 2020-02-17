@@ -33,7 +33,7 @@ class BalanceLogModel extends BaseModel
 	public static function balanceLogList($whereArr,$params,$extends=array())
 	{
 		$model  = self::find();
-		$where  = $whereArr['where'];
+		$where  = isset($whereArr['where'])?$whereArr['where']:[];
 		$whereAnd = isset($whereArr['whereAnd'])?$whereArr['whereAnd']:[];
 		$models = self::queryFormart($model,$where,$params,$whereAnd);
 		$model  = $models['model'];

@@ -22,16 +22,38 @@
 					</router-link>
 				</div>
 
+        <!-- 促销活动 -->
+        <div class="promotion" v-if="pintuanInfo">
+            <router-link tag="div" class="pintuan" to="/page/goods/promotion/pintuan">
+              <div class="img">
+                <img :src="pintuanInfo.pintuan_image" />
+                <!-- <div class="title">{{pintuanInfo.title}}</div> -->
+              </div>
+            </router-link>
+        </div>
+        <div class="promotion" v-if="seckillInfo">
+            <router-link tag="div" class="pintuan" to="/page/goods/promotion/seckill">
+              <div class="img">
+                <img :src="seckillInfo.seckill_image" />
+                <!-- <div class="title">{{pintuanInfo.title}}</div> -->
+              </div>
+            </router-link>
+        </div>
+
 
 				<div class="goods_list">
-					<div class="item" @click="toproduct(goods.goods_commonid)" v-for="(goods,index) in goodsList">
-						<div class="img">
-							<img  v-lazy="goods.goods_image"/>
-						</div>
-						<div class="goods_info">
-							<div class="goods_name">{{goods.goods_name}}</div>
-							<div class="goods_price">￥{{goods.goods_price}}</div>
-						</div>
+					<div
+            class="item"
+            @click="toproduct(goods.goods_commonid)"
+            v-for="(goods,index) in goodsList"
+            :key="index">
+              <div class="img">
+                <img  v-lazy="goods.goods_image"/>
+              </div>
+              <div class="goods_info">
+                <div class="goods_name">{{goods.goods_name}}</div>
+                <div class="goods_price">￥{{goods.goods_price}}</div>
+              </div>
 					</div>
 					<div class="clear"></div>
 					<div class="more" v-if="showMore && isMore">下拉加载显示更多...</div>
@@ -65,17 +87,21 @@ export default{
 			ifload:true,
 			banner:[],
 			classMenu:[],
+      pintuanInfo:[],
+      seckillInfo:[],
 		}
 	},
 	created() {
 		this.$nextTick(()=>{
-			this.get_product_list();
-			this.get_platinfo();
+			this.getProductList();
+			this.getPlatinfo();
+      this.getPromotionInfo();
 		})
 	},
 
 	methods:{
-		get_product_list() {
+    //获取商品
+		getProductList() {
 			if(this.isPost || !this.isMore) return true;
 			this.isPost = true;
 			this.$post_('goods/goods/list',{page:this.curpage},(res)=>{
@@ -98,16 +124,27 @@ export default{
 
 			});
 		},
-		get_platinfo() {
+    // 获取 轮播图，公告、分类等信息
+		getPlatinfo() {
 			this.$post_('platform/notice/platinfo',{},(res)=>{
 				console.log(res);
 				this.banner = res.data.banner;
 				this.classMenu = res.data.class_nav;
 			});
 		},
+
+    //获取促销信息
+    getPromotionInfo(){
+      this.$post_('goods/promotion/get_promotion_info',{},(res) =>{
+        this.pintuanInfo = res.data.pintuan_info;
+        this.seckillInfo = res.data.seckill_info;
+      })
+    },
+
+    //下拉到底部加载
 		scroll_end(pos,maxScrollY) {
 			if(maxScrollY==pos){
-				this.get_product_list()
+				this.getProductList()
 			}
 		},
 		scroll(pos,maxScrollY) {
@@ -159,15 +196,39 @@ export default{
 		display: inline-block;
 		width: 25%;
 		text-align: center;
-		padding:10px 0px;
+		padding:20px 0px;
 	}
 	.class_nav .item img{
 		width: 48px;
 	}
 	.class_nav .item .text{
-		font-size: 16px;
+		font-size: 13px;
 		/*line-height: 10px;*/
 	}
+  .promotion{
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .promotion .img{
+    position: relative;
+  }
+  .promotion .img .title{
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    background: rgba(0,0,0,0.4);
+    color:#fff;
+    font-size: 16px;
+    text-align: left;
+    text-indent: 10px;
+  }
+  .promotion .img img{
+    width: 100%;
+    max-height: 300px;
+  }
 
 	.goods_list{
 		width: 100%;
@@ -200,6 +261,11 @@ export default{
 	.goods_list .item .goods_info .goods_name{
 		text-indent: 5px;
 		font-size: 12px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
 	}
 	.goods_list .item .goods_info .goods_price{
 		color:#FF0036;

@@ -52,7 +52,6 @@
     margin: 0;
     padding: 0;
   }
-
   .btn {
     background: #333;
   }

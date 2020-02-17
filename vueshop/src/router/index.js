@@ -46,6 +46,12 @@ export default new Router({
       component:resolve =>require(['../page/member/browse_goods'],resolve),
       meta: {keepAlive: false,istab:false}
     },
+    {
+      path: '/page/member/my_coupons',
+      name: '我的优惠券',
+      component:resolve =>require(['../page/member/my_coupons'],resolve),
+      meta: {keepAlive: false,istab:false}
+    },    
 
     //设置相关
     {
@@ -119,7 +125,31 @@ export default new Router({
       meta: {keepAlive: false,istab:false}
     },
 
-
+    //促销相关
+    {
+      path: '/page/goods/promotion/pintuan',
+      name: '拼团列表',
+      component:resolve =>require(['../page/goods/promotion/pintuan'],resolve),
+      meta: {keepAlive: false,istab:false}
+    },
+    {
+      path: '/page/goods/promotion/seckill',
+      name: '秒杀列表',
+      component:resolve =>require(['../page/goods/promotion/seckill'],resolve),
+      meta: {keepAlive: false,istab:false}
+    },
+    {
+      path: '/page/goods/promotion/more_seckill',
+      name: '秒杀产品列表',
+      component:resolve =>require(['../page/goods/promotion/more_seckill'],resolve),
+      meta: {keepAlive: false,istab:false}
+    },
+    {
+      path: '/page/goods/promotion/more_pintuan',
+      name: '拼团产品列表',
+      component:resolve =>require(['../page/goods/promotion/more_pintuan'],resolve),
+      meta: {keepAlive: false,istab:false}
+    },    
 
     //订单相关
     {
@@ -150,6 +180,12 @@ export default new Router({
       path: '/page/order/order_list',
       name: '我的订单',
       component:resolve =>require(['../page/order/order_list'],resolve),
+      meta: {keepAlive: false}
+    },
+    {
+      path: '/page/order/order_detail',
+      name: '订单详情',
+      component:resolve =>require(['../page/order/order_detail'],resolve),
       meta: {keepAlive: false}
     },
     {

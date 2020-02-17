@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 //接口域名
-var postUrl = 'http://shopfx.admin.com/v1/';
-export let baseUrl  = 'http://shopfx.admin.com/v1/' 
+var postUrl = 'http://shopfx.admin.com/v1/'; //tinakj
+export let baseUrl  = 'http://shopfx.admin.com/v1/';
 
 export function post_(url,data,callback){
 
@@ -22,10 +22,10 @@ export function post_(url,data,callback){
         .catch(function (error) {
             console.log(error);
         });
-}  
+}
 
 export function ajax_upload(url,params,act)
-{ 
+{
     $.ajax({
         url:postUrl+url,
         data:params,
@@ -35,10 +35,10 @@ export function ajax_upload(url,params,act)
         contentType : false,
         // async:false,
         success:function(data){
-            //$("#alert-bg").fadeOut(2000); 
+            //$("#alert-bg").fadeOut(2000);
             act(data);
         },
-        error:function(e){ 
+        error:function(e){
             console.log('ajax error:',e);
             act(e.responseText);
         }
@@ -46,7 +46,7 @@ export function ajax_upload(url,params,act)
 }
 
 export function download(url) {
-    
+
     var iframe =document.createElement("iframe")
 
     iframe.style.display ="none";

@@ -11,6 +11,8 @@
         </div>
 
 		<div class="container">
+            <el-page-header @back="$router.back(-1)" content="文章编辑" style="margin-bottom: 20px;">
+            </el-page-header>
 			<el-row>
 				<el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
 					<el-form ref="form" :model="form" label-width="100px">

@@ -79,9 +79,7 @@
                 delVisible: false,
                 editGroup:false,
                 form: {
-                    value_name: '',
-                    show_name:'',
-                    sort:'',
+                    type_name: '',
                 },
                 id:0,
 

@@ -14,7 +14,7 @@
             <el-table :data="tableData" border class="table" ref="multipleTable">
 
                 <el-table-column prop="id" label="ID" width="100"></el-table-column>
-                
+
                 <el-table-column prop="value_name" label="值名称" > </el-table-column>
                 <el-table-column prop="show_name" label="显示名称" > </el-table-column>
                 <el-table-column prop="sort" label="排序" width="100"> </el-table-column>
@@ -36,11 +36,11 @@
                 </el-form-item>
                 <el-form-item label="显示名称">
                     <el-input v-model="form.show_name"></el-input>
-                </el-form-item>                
-                          
+                </el-form-item>
+
                 <el-form-item label="排序">
                     <el-input v-model="form.sort"></el-input>
-                </el-form-item>                
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
@@ -85,12 +85,12 @@
             this.specId = this.$route.query.spec_id;
             this.form.spec_id = this.specId;
             this.getData();
-        },        
+        },
         activated() {
             this.specId = this.$route.query.spec_id;
             this.form.spec_id = this.specId;
             this.getData();
-        },        
+        },
 
         methods: {
             // 获取数据
@@ -107,8 +107,8 @@
                 this.form.show_name = '';
                 this.form.sort = 0;
                 this.form.id = 0;
-                this.spec_id = this.specId;
-                this.id = 0;               
+                this.form.spec_id = this.specId;
+                this.id = 0;
                 this.editVisible = true;
             },
 
@@ -121,7 +121,7 @@
                     show_name: item.show_name,
                     sort: item.sort,
                     id:this.id,
-
+                    spec_id:this.specId,
                 }
                 this.editVisible = true;
             },

@@ -19,7 +19,7 @@ class GoodsModel extends BaseModel
 		return [
 			[['goods_id','goods_commonid','goods_name','gc_id','gc_id1','goods_image','goods_storage','goods_price'],'required'],
 			[['goods_name','goods_image','spec_name','goods_spec','goods_body','mobile_body'],'string'],
-			[['gc_id','gc_id1','gc_id2','gc_id3','goods_storage','goods_state','create_time','color_id','goods_commend'],'integer'],
+			[['gc_id','gc_id1','gc_id2','gc_id3','goods_storage','goods_state','create_time','update_time','color_id','goods_commend','promotion_type'],'integer'],
 			[['goods_price','goods_marketprice','goods_costprice','goods_freight','goods_storage_alarm'],'number'],
 		];
 	}	
@@ -37,15 +37,22 @@ class GoodsModel extends BaseModel
             'goods_image' => '商品主图',
             'goods_price' => '商品价格',
             'goods_storage' => '商品库存',
+            'promotion_type' => '商品类型',
         ];
     }
 
     //获取单个商品
     public static function getGoods($where,$field=['*'],$order=['goods_id'=> SORT_DESC])
     {
-    	$data = self::find()->select($field)->where($where)->asarray()->orderBy($order)->one();
+    	$data = self::find()->select($field)->where($where)->asarray()->one();
     	return $data;
+    }
 
+    public static function getGoodsSku($goodsCommonid,$field = ['*'])
+    {
+        $where = ['goods_commonid'=>$goodsCommonid];
+        $data = self::find()->select($field)->where($where)->asarray()->all();
+        return $data;        
     }
 
 }

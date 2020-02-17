@@ -17,6 +17,8 @@ class OrderCommonModel extends BaseModel
 		$data  =  self::find()->select($field)->where($where)->asarray()->one();
 		if(isset($data['reciver_info']))
 			$data['reciver_info'] = json_decode($data['reciver_info'],1);
+		if(isset($data['coupon_info']))
+			$data['coupon_info'] = json_decode($data['coupon_info'],1);		
 		
 		return $data;
 	}

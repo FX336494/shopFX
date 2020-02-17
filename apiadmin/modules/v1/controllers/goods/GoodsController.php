@@ -16,17 +16,37 @@ class GoodsController extends CoreController
 	*/
 	public function actionGoods_list()
 	{
-		$where = [];
+		$whereArr = $this->formatWhere();
 		$params = array(
 			'field' => ['goods_commonid','goods_name','gc_id','goods_image','goods_storage','goods_state','create_time','goods_price'],
 			'limit' => $this->request('page_size',10),
 			'page'	=> $this->request('page',1),
 		);
 		$extends = array('category');
-		$list  = GoodsCommon::goodsList($where,$params,$extends);
+		$list  = GoodsCommon::goodsList($whereArr,$params,$extends);
 		$pages = GoodsCommon::$pages;
 
 		$this->out('商品列表',$list,array('pages'=>$pages));
+	}
+
+	private function formatWhere()
+	{
+		$whereArr = $where = $and = [];
+		$where['goods_state'] = '1';
+		$search = $this->request('search');
+		$search = $search?json_decode($search,1):'';
+
+		if(isset($search['goods_name'])){
+			$and[] = ['like','goods_name',$search['goods_name']];
+		}
+
+		if(isset($search['promotion_type'])){
+			$where['promotion_type'] = $search['promotion_type'];
+		}
+
+		$whereArr['where'] = $where;
+		$whereArr['and'] = $and;
+		return $whereArr;
 	}
 
 	/*
@@ -92,7 +112,8 @@ class GoodsController extends CoreController
 	//处理规格数据
 	private function formatSpecName($specNameArr)
 	{
-		$specName = array();
+		if(!$specNameArr) return [];
+		$specName = [];
 		foreach($specNameArr as $val)
 		{
 			if(!$val) continue;
@@ -111,7 +132,7 @@ class GoodsController extends CoreController
 		{
 			foreach($specValue as $val)
 			{
-				if(!isset($val['spec_id']) || $val['spec_id']) continue;
+				if(!isset($val['spec_id']) || !$val['spec_id']) continue;
 				$temp[$val['spec_id']][$val['val_id']] = $val['spec_val'];
 			}
 			$valData = $temp;
@@ -200,6 +221,19 @@ class GoodsController extends CoreController
 		$flag = GoodsCommon::delGoods($goodsCommonId);
 		if($flag) $this->out('操作成功');
 		$this->error('删除失败');
+	}
+
+
+	/*
+		获取商品sku
+		* goods_commonid
+	*/
+	public function actionGet_goods()
+	{
+		if(!$goodsCommonid = $this->request('goods_commonid')) $this->error('参数错误');
+		$field = ['goods_id','goods_name','goods_price','goods_commonid'];
+		$data = Goods::getGoodsSku($goodsCommonid,$field);
+		$this->out('商品信息',$data);
 	}
 
 }

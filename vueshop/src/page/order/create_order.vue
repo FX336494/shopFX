@@ -44,7 +44,13 @@
           </div>
         </div>
       </div>
-
+      <div class="coupons" v-show="coupons.length>0">
+        <span class="name">优惠券</span>
+        <span class="value" v-show="coupon_id<=0" @click="showCoupon=!showCoupon">选择优惠券 > </span>
+        <span class="value active" v-show="coupon_id>0" @click="showCoupon=!showCoupon">
+          - ￥{{this.couponMoney}} >
+        </span>
+      </div>
 
       <div class="extra">
         <p class="item">
@@ -71,8 +77,14 @@
       </div>
       <div class="item submit" @click="create_order">提交订单</div>
     </div>
-    <pay v-if="showPay" @closePay="closePay" @payAfter="payAfter" :order_id="order_id" :totalFee="totalFee">
+    <pay
+      v-if="showPay"
+      @closePay="closePay"
+      @payAfter="payAfter"
+      :order_id="order_id">
     </pay>
+
+    <selectCoupons v-if="showCoupon" :coupons="coupons" @checkCoupon="checkCoupon"></selectCoupons>
 
     <loading :ifload="ifload"></loading>
     <fadeAlert :msg="msg" v-if="showAlert" @hideFade="showAlert=false" :url="url" :clsType="clsCode">
@@ -85,12 +97,14 @@
   import fadeAlert from '@/components/common/fadealert'
   import pay from '@/components/pay/pay'
   import loading from '@/components/common/loading'
+  import selectCoupons from '@/components/goods/select_coupons'
   export default {
     components: {
       topTile,
       fadeAlert,
       pay,
-      loading
+      loading,
+      selectCoupons
     },
     data() {
       return {
@@ -111,12 +125,20 @@
         order_id: '',
         totalFee: 0,
         totalMoney: 0,
+        join_order_id:0, //加入的团订单id
+        order_type:1,   //订单类型
+        showCoupon:false,
+        coupon_id:0, //优惠券id,
+        coupons:[], //可用优惠券
+        couponMoney:0,
       }
     },
     created() {
       this.cartIds = this.$route.query.cart_ids;
       this.ifcart = this.$route.query.ifcart;
       this.nums = this.$route.query.nums ? this.$route.query.nums : 1;
+      this.order_type = this.$route.query.order_type?this.$route.query.order_type:this.order_type;
+      this.join_order_id = this.$route.query.join_order_id?this.$route.query.join_order_id:0;
       this.$nextTick(() => {
         this._init_data();
       })
@@ -134,6 +156,7 @@
           if (res.code == '0') {
             this.cartList = res.data;
             this.extend = res.extend;
+            this.coupons = res.extend.coupons;
             this.calculatePrice();
           } else {
             this.$router.push('/');
@@ -143,6 +166,7 @@
       },
       calculatePrice() {
         this.totalNum = 0;
+        this.totalMoney = 0;
         for (var index in this.cartList) {
           let price = this.cartList[index]['goods_price'];
           let nums = this.cartList[index]['goods_num'];
@@ -151,6 +175,20 @@
 
         }
         this.totalMoney += parseInt(this.extend.freight);
+        this.totalMoney -= this.couponMoney;
+      },
+
+      //选择优惠券
+      checkCoupon(curCoupon) {
+        console.log(curCoupon);
+        this.showCoupon = false;
+        if(curCoupon.id){
+          this.coupon_id = curCoupon.id;
+          this.couponMoney = curCoupon.coupons_money;
+          this.calculatePrice();
+        }else{
+          this.coupon_id = 0;
+        }
       },
 
       //提交订单
@@ -158,7 +196,11 @@
         let params = {
           cart_ids: this.cartIds,
           address_id: this.extend.address.address_id,
-          message: this.userMsg
+          message: this.userMsg,
+          order_type:this.order_type,
+          join_order_id:this.join_order_id,
+          freight:this.extend.freight,
+          coupon_id:this.coupon_id,
         };
         console.log(params);
         this.ifload = true;
@@ -344,9 +386,31 @@
     width: 49%;
   }
 
+  .coupons{
+    line-height: 40px;
+    height: 40px;
+    background: #fff;
+    margin-top: 1px;
+    display: flex;
+  }
+  .coupons span{
+    flex: 1;
+  }
+  .coupons .name{
+    text-align: left;
+    text-indent:10px;
+  }
+  .coupons .value{
+    text-align: right;
+    padding-right: 10px;
+  }
+  .coupons .active{
+    color:#FF0036;
+  }
+
   .extra {
     background: #fff;
-    margin-top: 10px;
+    margin-top: 1px;
     padding-top: 10px;
     line-height: 40px;
   }

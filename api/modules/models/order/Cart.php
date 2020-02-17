@@ -28,15 +28,15 @@ class Cart extends \yii\db\ActiveRecord
 	}
 
 	//获取购物车里的商品
-	public function getGoods($where)
+	public static function getGoods($cartIds)
 	{
-		$field = "*";
-		$data = (new \yii\db\Query()) 
-				->select($field)  
-	    		->from('cart')  
-	    		->leftJoin('goods', 'cart.goods_id = goods.goods_id')
-	    		->where($where)
-	    		->all();
+		$where = ['in','cart_id',$cartIds];
+		$field = ['b.*','a.*'];
+		$data = self::find()->select($field)->alias('a')
+				->leftJoin('goods as b','a.goods_id=b.goods_id')
+				->where($where)
+				->asarray()->all();
+							
 	    return $data;
 	}
 
