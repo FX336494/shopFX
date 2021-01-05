@@ -12,7 +12,7 @@
     "fiximg": "xcopy %cd%\\dist\\static\\img %cd%\\dist\\static\\css\\static\\img /s /y /d /e /i"
   },
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.21.1",
     "babel-polyfill": "^6.26.0",
     "better-scroll": "^1.13.0",
     "fastclick": "^1.0.6",
